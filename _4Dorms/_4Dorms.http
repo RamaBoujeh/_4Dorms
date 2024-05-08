@@ -1,0 +1,6 @@
+@_4Dorms_HostAddress = http://localhost:5069
+
+GET {{_4Dorms_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
