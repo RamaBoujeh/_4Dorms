@@ -2,6 +2,6 @@
 {
     public interface IPaymentService
     {
-        Task<bool> ProcessPaymentAsync(int paymentGateId, int payerAccount, decimal amount);
+       // Task<bool> ProcessPaymentAsync(int paymentGateId, int payerAccount, decimal amount);
     }
 }
