@@ -41,7 +41,7 @@ namespace _4Dorms.Resources
         public UserType UserType { get; set; }
 
         public string? Disabilities { get; set; }
-        public bool CreateFavoriteList { get; set; }
+       // public bool CreateFavoriteList { get; set; }
 
     }
 }

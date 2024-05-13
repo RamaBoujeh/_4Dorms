@@ -14,18 +14,16 @@ namespace _4Dorms.Repositories.implementation
             _roomRepository = roomRepository;
         }
 
-        public async Task<bool> AddRoomAsync(RoomDTO roomDTO)
+        public async Task AddRoomAsync(bool? isPrivate, bool? isShared, int? numOfPrivateRooms, int? numOfSharedRooms, int? dormitoryId)
         {
             var room = new Room
             {
-                Amenities = roomDTO.Amenities,
-                Price = roomDTO.Price,
-                RoomNumber = roomDTO.RoomNumber,
-                DormitoryId = roomDTO.DormitoryId
+                privateRoom = isPrivate,
+                SharedRoom = isShared,
+                NumOfprivateRooms = numOfPrivateRooms,
+                NumOfSharedRooms = numOfSharedRooms,
+                DormitoryId = dormitoryId
             };
-
-            _roomRepository.Add(room);
-            return await _roomRepository.SaveChangesAsync();
         }
     }
 }

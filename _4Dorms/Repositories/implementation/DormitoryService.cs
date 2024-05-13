@@ -34,23 +34,21 @@ namespace _4Dorms.Repositories.implementation
             }
         }
 
-        public async Task<List<Dormitory>> SearchDormitoriesAsync(string dormName, string location, decimal? price, bool sortByLowToHigh)
+        public async Task<List<Dormitory>> SearchDormitoriesAsync(string keywords, string city, string nearbyUniversity, string genderType)
         {
             var query = _genericRepositoryDorm.Query();
 
-            if (!string.IsNullOrEmpty(dormName))
-                query = query.Where(d => d.DormitoryName.Equals(dormName));
+            if (!string.IsNullOrEmpty(keywords))
+                query = query.Where(d => d.DormitoryDescription.Contains(keywords));
 
-            if (!string.IsNullOrEmpty(location))
-                query = query.Where(d => d.Location.Equals(location));
+            if (!string.IsNullOrEmpty(city))
+                query = query.Where(d => d.City == city);
 
-            if (price.HasValue)
-                query = query.Where(d => d.Price == price.Value);
+            if (!string.IsNullOrEmpty(nearbyUniversity))
+                query = query.Where(d => d.NearbyUniversity == nearbyUniversity);
 
-            if (sortByLowToHigh)
-                query = query.OrderBy(d => d.Price);
-            else
-                query = query.OrderByDescending(d => d.Price);
+            if (!string.IsNullOrEmpty(genderType))
+                query = query.Where(d => d.GenderType == genderType);
 
             return await query.ToListAsync();
         }

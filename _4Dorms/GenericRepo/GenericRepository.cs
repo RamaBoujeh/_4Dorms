@@ -55,5 +55,9 @@ namespace _4Dorms.GenericRepo
         {
             return _entities.AsQueryable();
         }
+        public async Task<IEnumerable<T>> SearchDormitories(Expression<Func<T, bool>> predicate)
+        {
+            return await _entities.Where(predicate).ToListAsync();
+        }
     }
 }

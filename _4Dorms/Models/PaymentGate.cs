@@ -7,10 +7,10 @@ namespace _4Dorms.Models
         [Key]
         public int PaymentGateId { get; set; }
         [CreditCard]
-        public int PayerAccount { get; set; }
+        public int CardNumber { get; set; }
         public DateTime PaymentDate { get; set; }
-        public bool IsSuccessful { get; set; }
-        public string PaymentMethod { get; set; }
+        public DateTime ExpirationDate { get; set; }
+        public int CVV { get; set; }
         [DataType(DataType.Currency)]
         public decimal Amount { get; set; }
 

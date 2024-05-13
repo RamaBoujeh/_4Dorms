@@ -25,9 +25,15 @@ namespace _4Dorms.Repositories.implementation
             {
                 DormitoryOwnerId = dormitoryOwnerId,
                 DormitoryName = dormitoryDTO.DormitoryName,
+                GenderType = dormitoryDTO.GenderType,
+                City = dormitoryDTO.City,
+                NearbyUniversity = dormitoryDTO.NearbyUniversity,
+                phone = dormitoryDTO.phone,
+                Email = dormitoryDTO.Email,
+                DormitoryDescription = dormitoryDTO.DormitoryDescription,
+                PriceFullYear = dormitoryDTO.PriceFullYear,
+                PriceHalfYear = dormitoryDTO.PriceHalfYear,
                 Location = dormitoryDTO.Location,
-                Price = dormitoryDTO.Price,
-                Amenities = dormitoryDTO.Amenities,
                 Status = DormitoryStatus.Pending
             };
 
@@ -45,8 +51,14 @@ namespace _4Dorms.Repositories.implementation
 
             dormitory.DormitoryName = updatedDormitoryDTO.DormitoryName;
             dormitory.Location = updatedDormitoryDTO.Location;
-            dormitory.Price = updatedDormitoryDTO.Price;
-            dormitory.Amenities = updatedDormitoryDTO.Amenities;
+            dormitory.GenderType = updatedDormitoryDTO.GenderType;
+            dormitory.City = updatedDormitoryDTO.City;
+            dormitory.NearbyUniversity = updatedDormitoryDTO.NearbyUniversity;
+            dormitory.phone = updatedDormitoryDTO.phone;
+            dormitory.Email = updatedDormitoryDTO.Email;
+            dormitory.DormitoryDescription = updatedDormitoryDTO.DormitoryDescription;
+            dormitory.PriceHalfYear = updatedDormitoryDTO.PriceHalfYear;
+            dormitory.PriceFullYear = updatedDormitoryDTO.PriceFullYear;
 
             _genericRepositoryDorm.Update(dormitory);
             await _genericRepositoryDorm.SaveChangesAsync();

@@ -10,13 +10,23 @@ namespace _4Dorms.Resources
         [Required]
         [StringLength(150)]
         public string DormitoryName { get; set; }
+        public string GenderType { get; set; }
+        public string City { get; set; }
+        public string NearbyUniversity { get; set; }
+        [Phone]
+        public int phone { get; set; }
+        [EmailAddress]
+        public string Email { get; set; }
+        public string DormitoryDescription { get; set; }
         [Required]
         public string Location { get; set; }
         [Required]
         [DataType(DataType.Currency)]
-        public decimal Price { get; set; }
+        public decimal PriceHalfYear { get; set; }
+        [Required]
+        [DataType(DataType.Currency)]
 
-        public string Amenities { get; set; }
+        public decimal PriceFullYear { get; set; }
 
         public DormitoryStatus Status { get; set; }
 

@@ -32,20 +32,20 @@ namespace _4Dorms.Repositories.implementation
                         var student = MapToStudent(signUpData);
                         _studentRepository.Add(student);
                         await _studentRepository.SaveChangesAsync();
-                        if (signUpData.CreateFavoriteList)
-                        {
+                        //if (signUpData.CreateFavoriteList)
+                        //{
                             await CreateEmptyFavoriteListForUser(student.StudentId, UserType.Student);
-                        }
+                        //}
                         break;
 
                     case UserType.DormitoryOwner:
                         var dormitoryOwner = MapToDormitoryOwner(signUpData);
                         _dormitoryOwnerRepository.Add(dormitoryOwner);
                         await _dormitoryOwnerRepository.SaveChangesAsync();
-                        if (signUpData.CreateFavoriteList)
-                        {
+                        //if (signUpData.CreateFavoriteList)
+                        //{
                             await CreateEmptyFavoriteListForUser(dormitoryOwner.DormitoryOwnerId, UserType.DormitoryOwner);
-                        }
+                        //}
                         break;
 
                     default:

@@ -4,17 +4,10 @@ using _4Dorms.Repositories.Interfaces;
 using _4Dorms.GenericRepo;
 using _4Dorms.Models;
 using _4Dorms.Repositories.implementation;
+using _4Dorms;
 var builder = WebApplication.CreateBuilder(args);
 
-//builder.Services.AddDbContext<_4DormsDbContext>((serviceProvider, options) =>
-//{
-//    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-
-//    var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
-//    options.UseLoggerFactory(loggerFactory);
-//});
-
-// Add services to the container.
+builder.Services.AddCors();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -38,10 +31,18 @@ builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IGenericRepository<Booking>, GenericRepository<Booking>>();
 
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowedOriginsPolicy", builder =>
+    {
+        builder.AllowAnyOrigin() // Allow requests from any origin
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
 
 
 var app = builder.Build();
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -55,4 +56,12 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.UseCors("AllowedOriginsPolicy");
+
+app.UseStaticFiles();
+
+app.UseRouting();
+
 app.Run();
+
+

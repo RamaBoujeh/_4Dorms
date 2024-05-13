@@ -6,6 +6,6 @@ namespace _4Dorms.Repositories.Interfaces
     public interface IDormitoryService
     {
         Task<bool> SelectDormitoryAsync(int dormitoryId);
-        Task<List<Dormitory>> SearchDormitoriesAsync(string dormName, string location, decimal? price, bool sortByLowToHigh);
+        Task<List<Dormitory>> SearchDormitoriesAsync(string keywords, string city, string nearbyUniversity, string genderType);
     }
 }

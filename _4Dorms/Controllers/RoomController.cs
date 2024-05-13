@@ -16,21 +16,16 @@ namespace _4Dorms.Controllers
         }
 
         [HttpPost("add")]
-        public async Task<IActionResult> AddRoom(RoomDTO roomDTO)
+        public async Task<IActionResult> AddRoom(bool? isPrivate, bool? isShared, int? numOfPrivateRooms, int? numOfSharedRooms, int? dormitoryId)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                await _roomService.AddRoomAsync(isPrivate, isShared, numOfPrivateRooms, numOfSharedRooms, dormitoryId);
+                return Ok();
             }
-
-            var result = await _roomService.AddRoomAsync(roomDTO);
-            if (result)
+            catch (Exception ex)
             {
-                return Ok("Room added successfully.");
-            }
-            else
-            {
-                return StatusCode(500, "Failed to add room.");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
     }
