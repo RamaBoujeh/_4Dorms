@@ -16,6 +16,5 @@ namespace _4Dorms.Controllers
             _reviewService = reviewService;
             _logger = logger;
         }
-        public IActionResult Index() { }
     }
 }

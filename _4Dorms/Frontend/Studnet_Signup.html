@@ -1,0 +1,220 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="shortcut icon" href="Logo.png">
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SignUp|Student</title>
+    <style>
+        body {
+            background-image: linear-gradient(#3b5d50, #4e6d61);
+            font-family: "Inter", sans-serif;
+            color: #2f2f2f;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 50px auto;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="password"],
+        input[type="date"],
+        select {
+            width: 50%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #cccccc;
+            border-radius: 10px;
+            box-sizing: border-box;
+        }
+
+        .radio-buttons {
+            margin-bottom: 15px;
+        }
+
+        button.student-btn {
+            background-color: #3b5d50;
+            color: #ffffff;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            display: inline-block;
+            width: auto;
+            transition: background-color 0.3s;
+        }
+
+            button.student-btn:hover {
+                background-color: #4e6d61;
+            }
+
+        .disabilities {
+            width: 50%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #cccccc;
+            border-radius: 10px;
+            box-sizing: border-box;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Student Registration</h1>
+
+        <form class="student-signup" onsubmit="return validateForm()">
+            <div class="form-group">
+                <input type="text" id="fullname" class="fname ele" placeholder="Full Name" required>
+            </div>
+
+            <div class="form-group">
+                <input type="email" id="email" class="email ele" placeholder="Your Email" required>
+            </div>
+
+            <div class="form-group">
+                <input type="tel" id="phone" class="phone ele" placeholder="Phone Number" required>
+            </div>
+
+            <div class="form-group">
+                <input type="password" id="password" class="password ele" placeholder="Password" required>
+            </div>
+
+            <div class="form-group">
+                <input type="password" id="confirm-password" class="confirm-password ele" placeholder="Confirm Password" required>
+            </div>
+
+            <div class="form-group">
+                <input type="date" id="dob" class="dob ele" placeholder="Date of Birth" required>
+            </div>
+
+            <div class="form-group">
+                <select id="gender" class="gender ele" required>
+                    <option value="" disabled selected>Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+            <input type="hidden" id="user_type" name="user_type" value="0">
+            <input type="hidden" id="createFavoriteList" name="createFavoriteList" value="true">
+
+            <div class="form-group disabilities-wrapper">
+                <label>Do you have any disabilities?</label>
+                <div class="radio-buttons">
+                    <input type="radio" id="disabilities-yes" name="disabilities" value="yes" onclick="showDisabilitiesInput()">
+                    <label for="disabilities-yes">Yes</label>
+                    <input type="radio" id="disabilities-no" name="disabilities" value="no" onclick="hideDisabilitiesInput()">
+                    <label for="disabilities-no">No</label>
+                </div>
+                <input type="text" class="disabilities ele" placeholder="Enter your disabilities if any" style="display: none;">
+            </div>
+            <button type="submit" id="registerButton" class="student-btn clkbtn">Register</button>
+
+        </form>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.querySelector('.student-signup');
+            const disabilitiesInput = form.querySelector('.disabilities.ele');
+            const disabilitiesRadioYes = form.querySelector('#disabilities-yes');
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const formData = {
+                    Name: form.querySelector('#fullname').value,
+                    Email: form.querySelector('#email').value,
+                    Password: form.querySelector('#password').value,
+                    PhoneNumber: form.querySelector('#phone').value,
+                    Gender: form.querySelector('#gender').value,
+                    DateOfBirth: form.querySelector('#dob').value,
+                    UserType: 0, // Student
+                    Disabilities: disabilitiesRadioYes.checked ? disabilitiesInput.value : null
+                };
+
+                try {
+                    const response = await fetch('https://localhost:7209/api/User/signup', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData),
+                    });
+
+                    if (response.ok) {
+                        alert('User signed up successfully.');
+                        // Redirect to another page or perform any other action
+                    } else {
+                        alert('Failed to sign up user. Please try again later.');
+                    }
+                } catch (error) {
+                    console.error('Error during sign-up:', error);
+                    alert('An error occurred during sign-up. Please try again later.');
+                }
+            });
+
+            document.querySelectorAll('input[name="disabilities"]').forEach(radio => {
+                radio.addEventListener('change', (event) => {
+                    if (event.target.value === 'yes') {
+                        disabilitiesInput.style.display = 'block';
+                    } else {
+                        disabilitiesInput.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
+        function validateForm() {
+            const password = document.querySelector('#password').value;
+            const confirmPassword = document.querySelector('#confirm-password').value;
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match.');
+                return false;
+            }
+            return true;
+        }
+
+        function showDisabilitiesInput() {
+            const disabilitiesInput = document.querySelector('.disabilities.ele');
+            if (disabilitiesInput) {
+                disabilitiesInput.style.display = 'block';
+            } else {
+                console.error('Disabilities input element not found');
+            }
+        }
+
+        function hideDisabilitiesInput() {
+            const disabilitiesInput = document.querySelector('.disabilities.ele');
+            if (disabilitiesInput) {
+                disabilitiesInput.style.display = 'none';
+            } else {
+                console.error('Disabilities input element not found');
+            }
+        }
+    </script>
+</body>
+
+</html>

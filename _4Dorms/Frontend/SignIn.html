@@ -1,0 +1,155 @@
+﻿<html>
+
+<head>
+    <link rel="shortcut icon" href="Logo.png">
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sign in</title>
+    <style>
+        body {
+            background-image: linear-gradient(135deg, #3b5d50 10%, #4e6d61 100%);
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            font-family: "Inter", sans-serif;
+            color: #2f2f2f;
+        }
+
+        .box-form {
+            margin: 0 auto;
+            width: 900px;
+            height: 600px;
+            background: #FFFFFF;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex: 1 1 100%;
+            align-items: stretch;
+            justify-content: center;
+            box-shadow: 0 0 20px 6px #1d352685;
+            position: relative;
+            top: 75px;
+        }
+
+
+            .box-form .left {
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-image: url("images/why-choose-us-img.jpg");
+                height: 660px;
+                width: 500px;
+                left: 0;
+            }
+
+            .box-form .right {
+                padding: 20px;
+                overflow: hidden;
+            }
+
+                .box-form .right h5 {
+                    font-size: 3vmax;
+                    line-height: 0;
+                }
+
+                .box-form .right p {
+                    font-size: 14px;
+                    color: #B0B3B9;
+                }
+
+                    .box-form .right p a {
+                        color: #020202;
+                    }
+
+                .box-form .right .inputs {
+                    overflow: hidden;
+                }
+
+                .box-form .right input {
+                    width: 100%;
+                    padding: 10px;
+                    margin-top: 25px;
+                    font-size: 16px;
+                    border: none;
+                    outline: none;
+                    border-bottom: 2px solid #B0B3B9;
+                }
+
+                .box-form .right button {
+                    float: none;
+                    color: #fff;
+                    font-size: 16px;
+                    padding: 12px 35px;
+                    border-radius: 50px;
+                    display: inline-block;
+                    border: 0;
+                    outline: 0;
+                    position: absolute;
+                    background-color: #3b5d50;
+                    right: 50;
+                    margin-top: -30px;
+                    cursor: pointer;
+                }
+
+                    .box-form .right button:hover {
+                        background-color: #4e6d61;
+                    }
+    </style>
+</head>
+
+<body>
+
+    <body>
+        <div class="box-form">
+            <div class="left"></div>
+            <div class="right">
+                <h5>Login</h5>
+                <p>Don't have an account? <a href="SignUp.html">Create Your Account</a> it takes less than a minute</p>
+                <div class="inputs">
+                    <input type="text" id="username" placeholder="Username">
+                    <br>
+                    <input type="password" id="password" placeholder="Password">
+                </div>
+                <br><br>
+                <div class="forget-password">
+                    <p> <a href="ForgetPassword.html">Forget password?</a> </p>
+                </div>
+                <br>
+                <button id="loginButton">Login</button>
+            </div>
+        </div>
+
+        <script>
+            document.getElementById("loginButton").addEventListener("click", function() {
+                var username = document.getElementById("username").value;
+                var password = document.getElementById("password").value;
+
+                var signInData = {
+                    Email: username,
+                    Password: password,
+                    UserType: "Student" // Or "DormitoryOwner" or "Administrator" based on user selection
+                };
+
+                fetch('http://localhost:7209/api/User/signin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(signInData)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Redirect user or perform any other action upon successful login
+                        console.log("User signed in successfully.");
+                    } else {
+                        // Handle unauthorized access or other errors
+                        console.error("Invalid email or password.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error during sign-in:', error);
+                });
+            });
+        </script>
+    </body>
+
+</html>

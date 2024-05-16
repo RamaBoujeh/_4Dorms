@@ -33,5 +33,18 @@ namespace _4Dorms.Controllers
                 return StatusCode(500, "Failed to add dormitory to favorites.");
             }
         }
+
+        [HttpDelete("{favoriteListId}/remove")]
+        public async Task<IActionResult> RemoveDormitoryFromFavorites(int favoriteListId, [FromBody] int dormitoryId)
+        {
+            var result = await _favoriteListService.RemoveDormitoryFromFavoritesAsync(favoriteListId, dormitoryId);
+
+            if (result)
+            {
+                return Ok(new { Message = "Dormitory removed from favorites successfully." });
+            }
+
+            return BadRequest(new { Message = "Failed to remove dormitory from favorites." });
+        }
     }
 }

@@ -5,6 +5,7 @@ namespace _4Dorms.Models
 {
     public class Room
     {
+        public int RoomID { get; set; }
         public bool? privateRoom { get; set; }
         public bool? SharedRoom { get; set; }
         public int? NumOfprivateRooms { get; set; }

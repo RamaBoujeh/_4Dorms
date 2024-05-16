@@ -33,6 +33,27 @@ namespace _4Dorms.Repositories.implementation
 
             return true;
         }
+
+
+        public async Task<bool> RemoveDormitoryFromFavoritesAsync(int favoriteListId, int dormitoryId)
+        {
+            var favoriteList = await _favoriteListRepository.GetByIdAsync(favoriteListId);
+            if (favoriteList == null)
+            {
+                return false;
+            }
+            var dormitory = await _dormitoryRepository.GetByIdAsync(dormitoryId);
+            if (dormitory == null)
+            {
+                return false;
+            }
+
+            favoriteList.Dormitories.Remove(dormitory);
+
+            await _favoriteListRepository.SaveChangesAsync();
+
+            return true;
+        }
     }
 }
 

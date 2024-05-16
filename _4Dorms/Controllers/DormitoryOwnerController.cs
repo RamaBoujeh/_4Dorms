@@ -10,13 +10,14 @@ namespace _4Dorms.Controllers
     public class DormitoryOwnerController : ControllerBase
     {
         private readonly IDormitoryOwnerService _dormitoryOwnerService;
+
         public DormitoryOwnerController(IDormitoryOwnerService dormitoryOwnerService)
         {
             _dormitoryOwnerService = dormitoryOwnerService;
         }
 
         [HttpPost("submit-dormitory")]
-        public async Task<IActionResult> SubmitDormitoryForApproval(DormitoryDTO dormitoryDTO, int dormitoryOwnerId)
+        public async Task<IActionResult> SubmitDormitoryForApproval([FromBody] DormitoryDTO dormitoryDTO, int dormitoryOwnerId)
         {
             if (!ModelState.IsValid)
             {
@@ -28,7 +29,7 @@ namespace _4Dorms.Controllers
         }
 
         [HttpPut("update-dormitory/{dormitoryId}")]
-        public async Task<IActionResult> UpdateDormitory(int dormitoryId, DormitoryDTO updatedDormitoryDTO)
+        public async Task<IActionResult> UpdateDormitory(int dormitoryId, [FromBody] DormitoryDTO updatedDormitoryDTO)
         {
             if (!ModelState.IsValid)
             {

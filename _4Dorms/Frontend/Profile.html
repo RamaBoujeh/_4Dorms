@@ -1,0 +1,463 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="Untree.co">
+    <link rel="shortcut icon" href="Logo.png">
+    <meta name="description" content="" />
+
+    <!-- Bootstrap CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="css/tiny-slider.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/EachDorm.css" rel="stylesheet">
+    <title>4Dorms | Profile</title>
+</head>
+
+<body>
+
+    <!-- Start Header/Navigation -->
+    <nav class="custom-navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="Furni navigation bar">
+        <div class="container">
+            <a class="navbar-brand" href="HomePage.html">4Dorms<span>.</span></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarsFurni">
+                <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="HomePage.html">Home</a>
+                    </li>
+                    <li><a class="nav-link" href="Dorms.html">Dorms</a></li>
+                    <li><a class="nav-link" href="Fav.html">Favorites</a></li>
+                    <li><a class="nav-link" href="About.html">About us</a></li>
+                    <li><a class="nav-link" href="Contact.html">Contact us</a></li>
+                </ul>
+                <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
+                    <li class="active"><a id="user-icon" class="nav-link" href="Profile.html"><img src="images/user.svg"></a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- End Header/Navigation -->
+    <!-- Start Profile Container -->
+    <div class="profile-container">
+        <h1>User Profile</h1>
+        <div id="profile-pic" class="profile-pic"></div>
+        <button id="change-pic-btn">Change Profile Picture</button>
+        <div class="profile-info">
+            <label for="name">Name:</label>
+            <input type="text" id="name" placeholder="Full name">
+            <label for="email">Email:</label>
+            <input type="email" id="email" placeholder="Enter your email">
+            <label for="phone">Phone:</label>
+            <input type="tel" id="phone" placeholder="+962-799-425-321">
+            <label for="gender">Gender:</label>
+            <select id="gender">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+            <button id="save-btn">Save Changes</button>
+            <button id="logout-btn">Logout</button>
+        </div>
+    </div>
+    <!-- End Profile Container -->
+    <!-- Start Dorm Section -->
+    <div class="dorm-section">
+        <div class="container">
+            <h3>Your Dorm</h3>
+            <div class="row justify-content-between align-items-center">
+                <div class="col-lg-6">
+                    <div class="row my-5">
+                        <form id="dormForm">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item" id="name">Name: <input type="text" id="dormName"></li>
+                                <li class="list-group-item" id="for">For: <input type="text" id="dormFor"></li>
+                                <li class="list-group-item" id="city">City: <input type="text" id="dormCity"></li>
+                                <li class="list-group-item" id="location">Location: <input type="text" id="dormLocation"></li>
+                                <li class="list-group-item" id="uni">Nearby universities: <input type="text" id="dormUniversities"></li>
+                                <li class="list-group-item" id="phone">Phone: <input type="tel" id="dormPhone"></li>
+                                <li class="list-group-item" id="email">Email: <input type="email" id="dormEmail"></li>
+                                <li class="list-group-item" id="price_6">Price/6Months: <input type="number" id="dormPrice6"></li>
+                                <li class="list-group-item" id="price_12">Price/12Months: <input type="number" id="dormPrice12"></li>
+                                <li class="list-group-item" id="description">Description: <input type="text" id="dormDescription"></li>
+                                <label for="dormImage">Upload Dorm Images:</label>
+                                <input type="file" id="dormImage" accept="image/*" multiple>
+                            </ul>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div id="imageCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner" id="carouselInner"></div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#imageCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#imageCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Dorm Section -->
+    <!-- Add Dorm Button -->
+    <div class="button-container">
+        <button id="saveButton" disabled>Save Profile</button>
+        <button id="deleteButton">Delete Profile</button>
+        <button id="addRoomsButton">Add Rooms</button>
+    </div>
+
+    <!-- Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>Are you sure you want to delete your dorm information?</p>
+            <button id="confirmDeleteButton">Yes</button>
+            <button id="cancelDeleteButton">No</button>
+        </div>
+    </div>
+
+    <!-- Rooms Overlay -->
+    <div id="roomsOverlay" class="overlay">
+        <div class="overlay-content">
+            <span class="close-overlay">&times;</span>
+            <h2>Add Rooms</h2>
+            <form id="roomsForm">
+                <div>
+                    <input type="checkbox" id="privateRoomCheckbox">
+                    <label for="privateRoomCheckbox">Private Room</label>
+                    <div id="privateRoomInputContainer" class="room-input-container">
+                        <label for="privateRoomInput">Number of Private Rooms:</label>
+                        <input type="number" id="privateRoomInput" min="1" disabled>
+                    </div>
+                </div>
+                <div>
+                    <input type="checkbox" id="sharedRoomCheckbox">
+                    <label for="sharedRoomCheckbox">Shared Room</label>
+                    <div id="sharedRoomInputContainer" class="room-input-container">
+                        <label for="sharedRoomInput">Number of Shared Rooms:</label>
+                        <input type="number" id="sharedRoomInput" min="1" disabled>
+                    </div>
+                </div>
+                <button type="button" id="saveRoomsButton">Save Rooms</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/tiny-slider.js"></script>
+    <script src="js/custom.js"></script>
+    <script>
+        // To handle opening and closing of the profile
+        document.addEventListener("DOMContentLoaded", function () {
+            var profilePic = document.getElementById("profile-pic");
+            var changePicBtn = document.getElementById("change-pic-btn");
+            var saveBtn = document.getElementById("save-btn");
+            var logoutBtn = document.getElementById("logout-btn");
+            var userIcon = document.getElementById("user-icon");
+
+            // Logic to handle profile picture change
+            changePicBtn.addEventListener("click", function () {
+                var input = document.createElement("input");
+                input.type = "file";
+                input.accept = "image/*";
+                input.addEventListener("change", function (event) {
+                    var file = event.target.files[0];
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        profilePic.style.backgroundImage = "url('" + e.target.result + "')";
+                    }
+                    reader.readAsDataURL(file);
+                });
+                input.click();
+            });
+
+            // Logic to handle save button
+            saveBtn.addEventListener("click", function () {
+                // Collect and save profile info logic here
+            });
+
+            // Logic to handle logout button
+            logoutBtn.addEventListener("click", function () {
+                // Handle logout logic here
+            });
+        });
+
+        // Handling the dorm form and image upload
+        document.addEventListener("DOMContentLoaded", function () {
+            var saveDormBtn = document.getElementById("saveButton");
+            var dormName = document.getElementById("dormName").value;
+            var dormFor = document.getElementById("dormFor").value;
+            var dormCity = document.getElementById("dormCity").value;
+            var dormLocation = document.getElementById("dormLocation").value;
+            var dormUniversities = document.getElementById("dormUniversities").value;
+            var dormPhone = document.getElementById("dormPhone").value;
+            var dormEmail = document.getElementById("dormEmail").value;
+            var dormPrice6 = document.getElementById("dormPrice6").value;
+            var dormPrice12 = document.getElementById("dormPrice12").value;
+            var dormDescription = document.getElementById("dormDescription").value;
+
+            // Example of how to use the dorm information
+            var dormInfo = {
+                name: dormName,
+                for: dormFor,
+                city: dormCity,
+                location: dormLocation,
+                universities: dormUniversities,
+                phone: dormPhone,
+                email: dormEmail,
+                price6: dormPrice6,
+                price12: dormPrice12,
+                description: dormDescription
+            };
+
+            // You can perform further actions with dormInfo, such as sending it to a server, saving it locally, etc.
+            console.log("Dorm Information:", dormInfo);
+
+            /* Transfer the added dorm to the Dorms page with query parameters
+            var queryParams = Object.entries(dormInfo).map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join("&");
+            window.location.href = "Dorms.html?" + queryParams;*/
+        });
+
+        // Handling dorm image upload and display
+        var dormImageInput = document.getElementById("dormImage");
+        var carouselInner = document.getElementById("carouselInner");
+
+        // Function to handle dorm image upload and display
+        var handleDormImageUpload = function (files) {
+            carouselInner.innerHTML = ""; // Clear existing images
+
+            for (var i = 0; i < files.length; i++) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var img = document.createElement("img");
+                    img.src = e.target.result;
+                    img.classList.add("d-block", "w-100");
+
+                    var carouselItem = document.createElement("div");
+                    carouselItem.classList.add("carousel-item");
+                    if (carouselInner.children.length === 0) {
+                        carouselItem.classList.add("active");
+                    }
+                    carouselItem.appendChild(img);
+                    carouselInner.appendChild(carouselItem);
+                }
+                reader.readAsDataURL(files[i]);
+            }
+        };
+
+        // Handling dorm image upload and display
+        dormImageInput.addEventListener("change", function () {
+            handleDormImageUpload(this.files);
+        });
+
+        // Enable the save button when all fields are filled
+        var dormInputs = document.querySelectorAll("#dormForm input, #dormForm select");
+        dormInputs.forEach(function (input) {
+            input.addEventListener("input", function () {
+                var allFilled = Array.from(dormInputs).every(function (input) {
+                    return input.value.trim() !== "";
+                });
+                saveDormBtn.disabled = !allFilled;
+            });
+        });
+
+        // Handle the delete button click
+        var deleteButton = document.getElementById("deleteButton");
+        var deleteModal = document.getElementById("deleteModal");
+        var closeModal = document.querySelector(".close");
+        var confirmDeleteButton = document.getElementById("confirmDeleteButton");
+        var cancelDeleteButton = document.getElementById("cancelDeleteButton");
+
+        deleteButton.addEventListener("click", function () {
+            deleteModal.style.display = "block";
+        });
+
+        closeModal.addEventListener("click", function () {
+            deleteModal.style.display = "none";
+        });
+
+        cancelDeleteButton.addEventListener("click", function () {
+            deleteModal.style.display = "none";
+        });
+
+        confirmDeleteButton.addEventListener("click", function () {
+            // Clear all dorm input fields
+            dormInputs.forEach(function (input) {
+                input.value = "";
+            });
+
+            // Clear dorm images
+            carouselInner.innerHTML = "";
+
+            // Disable the save button again
+            saveDormBtn.disabled = true;
+            deleteModal.style.display = "none";
+            console.log("Dorm information and images deleted");
+        });
+
+        window.addEventListener("click", function (event) {
+            if (event.target == deleteModal) {
+                deleteModal.style.display = "none";
+            }
+        });
+
+        // Handle the add rooms button click
+        var addRoomsButton = document.getElementById("addRoomsButton");
+        var roomsOverlay = document.getElementById("roomsOverlay");
+        var closeOverlay = document.querySelector(".close-overlay");
+        var privateRoomCheckbox = document.getElementById("privateRoomCheckbox");
+        var sharedRoomCheckbox = document.getElementById("sharedRoomCheckbox");
+        var privateRoomInput = document.getElementById("privateRoomInput");
+        var sharedRoomInput = document.getElementById("sharedRoomInput");
+        var saveRoomsButton = document.getElementById("saveRoomsButton");
+
+        addRoomsButton.addEventListener("click", function () {
+            roomsOverlay.style.display = "block";
+        });
+
+        closeOverlay.addEventListener("click", function () {
+            roomsOverlay.style.display = "none";
+        });
+
+        window.addEventListener("click", function (event) {
+            if (event.target == roomsOverlay) {
+                roomsOverlay.style.display = "none";
+            }
+        });
+
+        privateRoomCheckbox.addEventListener("change", function () {
+            privateRoomInput.disabled = !this.checked;
+        });
+
+        sharedRoomCheckbox.addEventListener("change", function () {
+            sharedRoomInput.disabled = !this.checked;
+        });
+
+        saveRoomsButton.addEventListener("click", function () {
+            var roomsInfo = {
+                privateRooms: privateRoomCheckbox.checked ? privateRoomInput.value : 0,
+                sharedRooms: sharedRoomCheckbox.checked ? sharedRoomInput.value : 0
+            };
+            console.log("Rooms Information:", roomsInfo);
+            roomsOverlay.style.display = "none";
+        });
+    </script>
+
+    <style>
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+            .close:hover,
+            .close:focus {
+                color: black;
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* Overlay styles */
+        .overlay {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .overlay-content {
+            display: flex;
+            flex-direction: column;
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        #roomsForm div {
+            margin: 10px;
+        }
+
+        .close-overlay {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+            .close-overlay:hover,
+            .close-overlay:focus {
+                color: black;
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+        .room-input-container {
+            margin-top: 10px;
+        }
+
+            .room-input-container input {
+                margin-top: 5px;
+            }
+
+        .overlay-content #roosForm #saveRoomsButton {
+            margin: 10px;
+        }
+
+            .overlay-content #roosForm #saveRoomsButton:hover {
+                cursor: pointer;
+                background-color: 3b5d50;
+            }
+    </style>
+</body>
+
+</html>

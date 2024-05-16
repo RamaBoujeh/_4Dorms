@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using _4Dorms.Persistance;
 
@@ -11,9 +12,11 @@ using _4Dorms.Persistance;
 namespace _4Dorms.Migrations
 {
     [DbContext(typeof(_4DormsDbContext))]
-    partial class _4DormsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240515154521_TablesUpdate")]
+    partial class TablesUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -61,10 +64,6 @@ namespace _4Dorms.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProfilePictureUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("AdministratorId");
 
                     b.ToTable("Administrators");
@@ -76,8 +75,7 @@ namespace _4Dorms.Migrations
                             Email = "Ruaa@example.com",
                             Name = "Ruaa",
                             Password = "000",
-                            PhoneNumber = "1234567890",
-                            ProfilePictureUrl = "none"
+                            PhoneNumber = "1234567890"
                         });
                 });
 
@@ -187,28 +185,6 @@ namespace _4Dorms.Migrations
                     b.ToTable("Dormitories");
                 });
 
-            modelBuilder.Entity("_4Dorms.Models.DormitoryImage", b =>
-                {
-                    b.Property<int>("ImageId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ImageId"));
-
-                    b.Property<int>("DormitoryId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ImageId");
-
-                    b.HasIndex("DormitoryId");
-
-                    b.ToTable("DormitoryImages");
-                });
-
             modelBuilder.Entity("_4Dorms.Models.DormitoryOwner", b =>
                 {
                     b.Property<int>("DormitoryOwnerId")
@@ -237,10 +213,6 @@ namespace _4Dorms.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProfilePictureUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -399,10 +371,6 @@ namespace _4Dorms.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProfilePictureUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("StudentId");
 
                     b.ToTable("Students");
@@ -465,17 +433,6 @@ namespace _4Dorms.Migrations
                     b.Navigation("DormitoryOwner");
                 });
 
-            modelBuilder.Entity("_4Dorms.Models.DormitoryImage", b =>
-                {
-                    b.HasOne("_4Dorms.Models.Dormitory", "Dormitory")
-                        .WithMany("ImageUrls")
-                        .HasForeignKey("DormitoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Dormitory");
-                });
-
             modelBuilder.Entity("_4Dorms.Models.FavoriteList", b =>
                 {
                     b.HasOne("_4Dorms.Models.DormitoryOwner", "DormitoryOwner")
@@ -518,8 +475,6 @@ namespace _4Dorms.Migrations
             modelBuilder.Entity("_4Dorms.Models.Dormitory", b =>
                 {
                     b.Navigation("Bookings");
-
-                    b.Navigation("ImageUrls");
 
                     b.Navigation("Reviews");
 

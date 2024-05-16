@@ -14,6 +14,7 @@ namespace _4Dorms.Persistance
         public virtual DbSet<Review> Reviews { get; set; }
         public virtual DbSet<Room> Rooms { get; set; }
         public virtual DbSet<Student> Students { get; set; }
+        public virtual DbSet<DormitoryImage> DormitoryImages { get; set; }  
 
         public _4DormsDbContext(DbContextOptions<_4DormsDbContext> options) : base(options) { }
 
@@ -28,7 +29,8 @@ namespace _4Dorms.Persistance
                     Name = "Ruaa",
                     Email = "Ruaa@example.com",
                     PhoneNumber = "1234567890",
-                    Password = "000"
+                    Password = "000",
+                    ProfilePictureUrl = "none"
                 }
             );
             modelBuilder.Entity<FavoriteList>()

@@ -1,0 +1,362 @@
+﻿.dorm-section form ul li span {
+    font-size: larger;
+    font-weight: bold;
+}
+
+form {
+    height: fit-content;
+    border-radius: 10px;
+    /* Adjust the border-radius value as needed */
+    border: 1px solid #ccc;
+    /* Add border for better visibility */
+    padding: 20px;
+    /* Add padding for spacing inside the form */
+}
+
+#name span {
+    font-size: x-large;
+    text-decoration: underline;
+    text-decoration-color: #3b5d50;
+    text-decoration-thickness: 3px;
+}
+
+.dorm-section .container #imageCarousel .carousel-inner {
+    top: 0;
+    height: fit-content;
+    border-radius: 10px;
+    /* Adjust the border-radius value as needed */
+    border: 1px solid #ccc;
+    /* Add border for better visibility */
+    padding: 20px;
+    /* Add padding for spacing inside the form */
+}
+
+.carousel-item img {
+    height: 100%;
+}
+
+.review-section {
+    padding: 50px 0;
+    color: #000;
+}
+
+    .review-section h2 {
+        margin-bottom: 30px;
+    }
+
+    .review-section form {
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        padding: 20px;
+    }
+
+        .review-section form label {
+            font-weight: bold;
+        }
+
+        .review-section form button[type="submit"] {
+            margin-top: 10px;
+            width: fit-content;
+        }
+
+    .review-section #reviewList {
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        padding: 20px;
+        height: 300px;
+        /* Adjust height as needed */
+        overflow-y: auto;
+    }
+
+    .review-section .review-item {
+        margin-bottom: 20px;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 10px;
+    }
+
+        .review-section .review-item:last-child {
+            border-bottom: none;
+        }
+
+        .review-section .review-item h4,
+        .review-item p {
+            color: #000;
+            /* Set the color to black */
+        }
+
+.star-rating input {
+    display: none;
+    /* Hide the radio buttons */
+}
+
+.star-rating label {
+    display: inline-block;
+    font-size: xx-small;
+    width: 30px;
+    height: 10px;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    position: relative;
+}
+
+    .star-rating label:before {
+        content: "\2605";
+        position: absolute;
+        display: inline-block;
+        font-size: 20px;
+        top: 0;
+        left: 0;
+    }
+
+    .star-rating label:after {
+        content: "\2605";
+        position: absolute;
+        display: inline-block;
+        font-size: 20px;
+        top: 0;
+        left: 0;
+        color: #f8b810;
+        opacity: 0;
+    }
+
+    .star-rating label:hover:after,
+    .star-rating label:hover ~ label:after,
+    .star-rating input:checked ~ label:after {
+        opacity: 1;
+    }
+
+/* Style for Check Availability buttons */
+.btn-primary {
+    font-size: 1rem;
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: #3b5d50;
+    /* Blue color for public room button */
+    color: #fff;
+    /* White text color */
+    border: none;
+    transition: background-color 0.3s ease;
+    width: 300px;
+    height: fit-content;
+}
+
+    .btn-primary:hover {
+        background-color: #3b5d50;
+        /* Darker blue color on hover */
+    }
+
+/* Style for message box */
+.modal {
+    display: none;
+    /* Hide the message box by default */
+    position: fixed;
+    /* Position the message box relative to the viewport */
+    z-index: 1;
+    /* Set a high z-index to make sure it appears on top of other elements */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    /* Enable scrolling if the content overflows */
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Semi-transparent background */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    /* White background */
+    margin: 15% auto;
+    /* Center the message box vertically and horizontally */
+    padding: 20px;
+    border: 1px solid #888;
+    border-radius: 5px;
+    max-width: 400px;
+    /* Set maximum width for the message box */
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+.btn-success {
+    margin-top: 10px;
+}
+
+    .btn-success:hover {
+        background-color: #3b5d50;
+        border-color: #3b5d50;
+    }
+
+/* Styles for booking overlay */
+.booking-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Semi-transparent black background */
+    z-index: 1000;
+    /* Ensure the booking overlay is on top of other content */
+}
+
+.booking-container {
+    width: 600px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    /* Add a shadow effect */
+}
+
+.booking-form {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+    .booking-form label {
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .booking-form input[type="text"],
+    .booking-form input[type="email"],
+    .booking-form select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+        left: 5px;
+    }
+
+    .booking-form button {
+        width: 100%;
+        padding: 10px;
+        background-color: #3b5d50;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .booking-form button:hover {
+            background-color: #3b5d50;
+        }
+
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    background-color: transparent;
+    /* Remove background color */
+    border: none;
+    /* Remove border */
+}
+
+    .close-btn:hover,
+    .close-btn:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+/* Styles for payment overlay */
+.payment-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.payment-container {
+    width: 400px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+}
+
+    .payment-container h2 {
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .payment-container label {
+        display: block;
+        margin-bottom: 10px;
+        color: #555;
+    }
+
+    .payment-container input[type="text"],
+    .payment-container input[type="email"],
+    .payment-container select {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+        font-size: 16px;
+    }
+
+    .payment-container button[type="submit"] {
+        width: 100%;
+        padding: 12px;
+        background-color: #3b5d50;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        font-size: 16px;
+    }
+
+        .payment-container button[type="submit"]:hover {
+            background-color: #344e41;
+        }
+
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+    .close-btn:hover,
+    .close-btn:focus {
+        color: #333;
+    }

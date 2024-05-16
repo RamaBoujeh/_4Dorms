@@ -13,7 +13,16 @@ namespace _4Dorms.Repositories.implementation
             _paymentGateRepository = paymentGateRepository;
         }
 
-        
+        public Task<bool> ProcessPayment(int cardNumber, DateTime expirationDate, int cvv, decimal amount)
+        {
+            // Emulated payment processing logic
+            if (expirationDate > DateTime.Now && cvv.ToString().Length == 3)
+            {
+                // Simulate a successful payment process
+                return Task.FromResult(true);
+            }
+            return Task.FromResult(false);
+        }
 
     }
 }

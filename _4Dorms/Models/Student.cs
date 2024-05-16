@@ -21,6 +21,7 @@ namespace _4Dorms.Models
         [DataType(DataType.Date)]
         public DateTime DateOfBirth { get; set; }
         public string Disabilities { get; set; }
+        public string ProfilePictureUrl { get; set; }
         public virtual ICollection<FavoriteList> Favorites { get; set; }
 
         public Student()

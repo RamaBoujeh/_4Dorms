@@ -31,7 +31,7 @@ namespace _4Dorms.Controllers
         [HttpDelete("{UserId}")]
         public async Task<IActionResult> DeleteUserProfileByAdmin(int UserId, UserType userType)
         {
-            var result = await _administratorService.DeleteUserProfileByAdminAsync(UserId, userType);
+            var result = await _administratorService.DeleteUserProfileAsync(UserId, userType);
             if (result)
                 return Ok();
             else

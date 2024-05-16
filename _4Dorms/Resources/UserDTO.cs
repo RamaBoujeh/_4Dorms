@@ -13,5 +13,7 @@
         public DateTime DateOfBirth { get; set; }
         public string? Disabilities { get; set; }
         public string Password { get; set; }
+        public string ProfilePictureUrl { get; set; }
+
     }
 }

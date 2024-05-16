@@ -11,6 +11,7 @@ namespace _4Dorms.Repositories.implementation
         private readonly IGenericRepository<Dormitory> _genericRepositoryDorm;
         private readonly IGenericRepository<Student> _genericRepositoryStudent;
         private readonly IGenericRepository<DormitoryOwner> _genericRepositoryDormitoryOwner;
+        private readonly IGenericRepository<FavoriteList> _genericRepositoryFavoriteList;
 
         public AdministratorService(IGenericRepository<Administrator> genericRepositoryAdmin,
             IGenericRepository<Dormitory> genericRepositoryDorm,
@@ -41,7 +42,7 @@ namespace _4Dorms.Repositories.implementation
             }
         }
 
-        public async Task<bool> DeleteUserProfileByAdminAsync(int userId, UserType userType)
+        public async Task<bool> DeleteUserProfileAsync(int userId, UserType userType)
         {
             switch (userType)
             {
@@ -49,6 +50,10 @@ namespace _4Dorms.Repositories.implementation
                     var student = await _genericRepositoryStudent.GetByIdAsync(userId);
                     if (student == null)
                         return false;
+
+                    // Remove the student's favorite list
+                    await RemoveFavoriteListForUser(userId, UserType.Student);
+
                     _genericRepositoryStudent.Remove(userId);
                     return await _genericRepositoryStudent.SaveChangesAsync();
 
@@ -56,12 +61,45 @@ namespace _4Dorms.Repositories.implementation
                     var dormOwner = await _genericRepositoryDormitoryOwner.GetByIdAsync(userId);
                     if (dormOwner == null)
                         return false;
+
+                    // Remove the dormitory owner's favorite list
+                    await RemoveFavoriteListForUser(userId, UserType.DormitoryOwner);
+
                     _genericRepositoryDormitoryOwner.Remove(userId);
                     return await _genericRepositoryDormitoryOwner.SaveChangesAsync();
+
                 default:
                     throw new ArgumentException("Invalid user type.");
             }
         }
+
+        private async Task RemoveFavoriteListForUser(int favoriteListId, UserType userType)
+        {
+            switch(userType)
+            {
+                case UserType.Student:
+                    var studentFavoriteList = await _genericRepositoryFavoriteList.GetByIdAsync(favoriteListId);
+                    if (studentFavoriteList != null)
+                    {
+                        _genericRepositoryFavoriteList.Remove(favoriteListId);
+                        await _genericRepositoryFavoriteList.SaveChangesAsync();
+                    }
+                    break;
+
+                case UserType.DormitoryOwner:
+                    var dormitoryOwnerFavoriteList = await _genericRepositoryFavoriteList.GetByIdAsync(favoriteListId);
+                    if (dormitoryOwnerFavoriteList != null)
+                    {
+                        _genericRepositoryFavoriteList.Remove(favoriteListId);
+                        await _genericRepositoryFavoriteList.SaveChangesAsync();
+                    }
+                    break;
+
+                default:
+                    break;
+                }
+            }
+
     }
 }
 

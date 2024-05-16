@@ -1,0 +1,383 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="Untree.co">
+    <link rel="shortcut icon" href="Logo.png">
+    <meta name="description" content="" />
+
+    <!-- Bootstrap CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="css/tiny-slider.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <title>4Dorms | Dorms</title>
+</head>
+
+<body>
+
+    <!-- Start Header/Navigation -->
+    <nav class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark" aria-label="Furni navigation bar">
+
+        <div class="container">
+            <a class="navbar-brand" href="HomePage.html">4Dorms<span>.</span></a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni"
+                    aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarsFurni">
+                <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+                    <li class="nav-item ">
+                        <a class="nav-link" href="HomePage.html">Home</a>
+                    </li>
+                    <li class="active"><a class="nav-link" href="Dorms.html">Dorms</a></li>
+                    <li><a class="nav-link" href="Fav.html">Favorites</a></li>
+                    <li><a class="nav-link" href="About.html">About us</a></li>
+                    <li><a class="nav-link" href="Contact.html">Contact us</a></li>
+                </ul>
+
+                <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
+                    <li><a id="user-icon" class="nav-link" href="Profile.html"><img src="images/user.svg"></a></li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+    <!-- End Header/Navigation -->
+    <!-- Start Search Section -->
+    <div class="search-section">
+        <form class="row row-cols-lg-auto g-3 align-items-center">
+            <div class="col-12">
+                <label class="visually-hidden" for="inlineFormInputGroupUsername">Username</label>
+                <div class="input-group">
+                    <img src="images/Search.png" alt="Image" class="imf-fluid">
+                    <input type="text" class="form-control" id="inlineFormInputGroupUsername" placeholder="keywords">
+                </div>
+            </div>
+
+            <div class="col-12">
+                <label class="visually-hidden" for="inlineFormSelectPref">University</label>
+                <select class="form-select" id="inlineFormSelectUniversity">
+                    <option selected>Uni...</option>
+                    <option value="1">University of Jordan</option>
+                    <option value="2">Jordan University of Science and Technology</option>
+                    <option value="3">Yarmouk University</option>
+                    <option value="4">Hashemite University</option>
+                    <option value="5">Mutah University</option>
+                    <option value="6">Al-Balqa Applied University</option>
+                    <option value="7">Jordan University of Technology</option>
+                    <option value="8">Philadelphia University</option>
+                    <option value="9">German Jordanian University</option>
+                    <option value="10">Princess Sumaya University for Technology</option>
+                </select>
+            </div>
+            <div class="col-12">
+                <label class="visually-hidden" for="inlineFormSelectCity">City</label>
+                <select class="form-select" id="inlineFormSelectCity">
+                    <option value="1">Amman</option>
+                    <option value="2">Irbid</option>
+                    <option value="3">Jaresh</option>
+                    <option value="4">Ajloun</option>
+                    <option value="5">Aqaba</option>
+                    <option value="6">Zarqa</option>
+                    <option value="7">Salt</option>
+                    <option value="8">Madaba</option>
+                    <option value="9">Karak</option>
+                    <option value="10">Ma'an</option>
+                </select>
+            </div>
+            <div class="col-12">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="genderFemale" name="gender" value="female">
+                    <label class="form-check-label" for="genderFemale">
+                        Female
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="genderMale" name="gender" value="male">
+                    <label class="form-check-label" for="genderMale">
+                        Male
+                    </label>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary" id="search">Search</button>
+            </div>
+        </form>
+    </div>
+    <!-- End Search Section -->
+    <!-- Start Product Section -->
+    <div class="untree_co-section product-section before-footer-section">
+        <div class="container">
+            <div class="row">
+
+                <!-- Start Column 1 -->
+                <div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
+                    <div class="product-item">
+                        <a href="cart.html">
+                            <img src="images/albasem.jpg" class="img-fluid product-thumbnail">
+                        </a>
+                        <div class="product-details">
+                            <h3 class="product-title">Albasem Female Dorm</h3>
+                            <strong class="product-price">Amman</strong>
+                            <button class="favorite-btn" onclick="addToFavorites('Albasem Female Dorm', 'Amman')">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Column 1 -->
+                <!-- Start Column 2 -->
+                <div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
+                    <div class="product-item">
+                        <a href="Everest.html">
+                            <img src="images/everest.jpg" class="img-fluid product-thumbnail">
+                        </a>
+                        <div class="product-details">
+                            <h3 class="product-title">Everest Male Dorm</h3>
+                            <strong class="product-price">Irbid</strong>
+                            <button class="favorite-btn" onclick="addToFavorites('Everest Male Dorm', 'Irbid')">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Column 2 -->
+                <!-- Start Column 3 -->
+                <div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
+                    <div class="product-item">
+                        <a href="cart.html">
+                            <img src="images/petronas.jpg" class="img-fluid product-thumbnail">
+                        </a>
+                        <div class="product-details">
+                            <h3 class="product-title">Petronas Female Dorm</h3>
+                            <strong class="product-price">Amman</strong>
+                            <button class="favorite-btn" onclick="addToFavorites('Petronas Female Dorm', 'Amman')">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Column 3 -->
+                <!-- Start Column 4 -->
+                <div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
+                    <div class="product-item">
+                        <a href="cart.html">
+                            <img src="images/arak.jpg" class="img-fluid product-thumbnail">
+                        </a>
+                        <div class="product-details">
+                            <h3 class="product-title">Arak Male Dorm</h3>
+                            <strong class="product-price">Irbid</strong>
+                            <button class="favorite-btn" onclick="addToFavorites('Arak Male Dorm', 'Irbid')">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Column 4 -->
+            </div>
+        </div>
+    </div>
+    <!-- End Product Section -->
+    <!-- Start Footer Section -->
+    <footer class="footer-section">
+        <div class="container relative">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="subscription-form">
+                        <h3 class="d-flex align-items-center">
+                            <span class="me-1">
+                                <img src="images/envelope-outline.svg"
+                                     alt="Image" class="img-fluid">
+                            </span><span>Subscribe to Newsletter</span>
+                        </h3>
+
+                        <form action="#" class="row g-3">
+                            <div class="col-auto">
+                                <input type="text" class="form-control" placeholder="Enter your name">
+                            </div>
+                            <div class="col-auto">
+                                <input type="email" class="form-control" placeholder="Enter your email">
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-primary">
+                                    <span class="fa fa-paper-plane"></span>
+                                </button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-5 mb-5">
+                <div class="col-lg-4">
+                    <div class="mb-4 footer-logo-wrap">
+                        <a href="#" class="footer-logo">4Dorms<span>.</span></a>
+                    </div>
+                    <p class="mb-4">
+                        To simplify the process of booking student accommodations, benefiting both
+                        students
+                        and dormitory owners. This aims to increase dormitory occupancy rates and revenue
+                        streams while
+                        providing students with secure and comfortable housing options, enabling them to.
+                    </p>
+
+                    <ul class="list-unstyled custom-social">
+                        <li><a href="#"><span class="fa fa-brands fa-facebook-f"></span></a></li>
+                        <li><a href="#"><span class="fa fa-brands fa-twitter"></span></a></li>
+                        <li><a href="#"><span class="fa fa-brands fa-instagram"></span></a></li>
+                        <li><a href="#"><span class="fa fa-brands fa-linkedin"></span></a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-8">
+                    <div class="row links-wrap">
+                        <div class="col-6 col-sm-6 col-md-3">
+                            <ul class="list-unstyled">
+                                <li><a href="#">Dorms</a></li>
+                                <li><a href="#">Favorites</a></li>
+                                <li><a href="#">Contact us</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="col-6 col-sm-6 col-md-3">
+                            <ul class="list-unstyled">
+                                <li><a href="#">Our team</a></li>
+                                <li><a href="#">About us</a></li>
+                                <li><a href="#">Support</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="col-6 col-sm-6 col-md-3">
+                            <ul class="list-unstyled">
+                                <li><a href="#">Services</a></li>
+                                <li><a href="#">Jobs</a></li>
+                                <li><a href="#">Privacy Policy</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="border-top copyright">
+                <div class="row pt-4">
+                    <div class="col-lg-6">
+                        <p class="mb-2 text-center text-lg-start">
+                            Copyright &copy;
+                            <script>document.write(new Date().getFullYear());</script>&mdash;
+                            Designed with love.
+                        </p>
+                    </div>
+
+                    <div class="col-lg-6 text-center text-lg-end">
+                        <ul class="list-unstyled d-inline-flex ms-auto">
+                            <li class="me-4"><a href="#">Terms &amp; Conditions</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </footer>
+    <!-- End Footer Section -->
+
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/tiny-slider.js"></script>
+    <script src="js/custom.js"></script>
+
+    <!--search -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get reference to the search form
+            const searchForm = document.querySelector('.search-section form');
+
+            // Add event listener to the form submission
+            searchForm.addEventListener('submit', function (event) {
+                event.preventDefault(); // Prevent form submission
+
+                // Get input values from the form
+                const keywords = document.getElementById('inlineFormInputGroupUsername').value;
+                const university = document.getElementById('inlineFormSelectUniversity').value;
+                const city = document.getElementById('inlineFormSelectCity').value;
+                const gender = document.querySelector('input[name="gender"]:checked').value;
+
+                // Construct search query or prepare data to send to backend
+                const searchData = {
+                    keywords: keywords,
+                    university: university,
+                    city: city,
+                    gender: gender
+                };
+
+                // Replace this with your backend endpoint URL
+                const backendUrl = 'https://your-backend-url.com/search';
+
+                // Example: Send a GET request to your backend with search data
+                fetch(backendUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(searchData)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Handle the response from the backend (e.g., update the UI with search results)
+                        console.log(data);
+                    })
+                    .catch(error => {
+                        console.error('There was a problem with your fetch operation:', error);
+                        // Handle errors (e.g., display error message to the user)
+                    });
+            });
+        });
+    </script>
+    <script>
+        function addToFavorites(dormName, city) {
+            const favoriteData = {
+                FavoriteListId: 1, // Example FavoriteListId, replace with actual value
+                DormitoryId: 1, // Example DormitoryId, replace with actual value
+                DormName: dormName,
+                City: city
+            };
+
+            fetch('api/FavoriteList/add-to-favorites', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(favoriteData)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(data); // Log success message
+                    // You can add UI feedback here if needed
+                })
+                .catch(error => {
+                    console.error('There was a problem with your fetch operation:', error);
+                    // Handle errors (e.g., display error message to the user)
+                });
+        }
+    </script>
+</body>
+
+</html>

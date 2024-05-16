@@ -37,6 +37,11 @@ namespace _4Dorms.Repositories.implementation
                 Status = DormitoryStatus.Pending
             };
 
+            foreach (var imageUrl in dormitoryDTO.ImageUrls)
+            {
+                dormitory.ImageUrls.Add(new DormitoryImage { Url = imageUrl });
+            }
+
             _genericRepositoryDorm.Add(dormitory);
             await _genericRepositoryDorm.SaveChangesAsync();
         }
@@ -59,6 +64,16 @@ namespace _4Dorms.Repositories.implementation
             dormitory.DormitoryDescription = updatedDormitoryDTO.DormitoryDescription;
             dormitory.PriceHalfYear = updatedDormitoryDTO.PriceHalfYear;
             dormitory.PriceFullYear = updatedDormitoryDTO.PriceFullYear;
+            foreach (var image in dormitory.ImageUrls.ToList())
+            {
+                _genericRepositoryDorm.Remove(image.ImageId);
+            }
+            dormitory.ImageUrls.Clear();
+
+            foreach (var imageUrl in updatedDormitoryDTO.ImageUrls)
+            {
+                dormitory.ImageUrls.Add(new DormitoryImage { Url = imageUrl });
+            }
 
             _genericRepositoryDorm.Update(dormitory);
             await _genericRepositoryDorm.SaveChangesAsync();
@@ -70,6 +85,11 @@ namespace _4Dorms.Repositories.implementation
             if (dormitory == null)
             {
                 throw new Exception("Dormitory not found");
+            }
+
+            foreach (var image in dormitory.ImageUrls.ToList())
+            {
+                _genericRepositoryDorm.Remove(image.ImageId);
             }
 
             _genericRepositoryDorm.Remove(dormitoryId);

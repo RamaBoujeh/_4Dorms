@@ -32,9 +32,11 @@ namespace _4Dorms.Models
         public decimal PriceHalfYear { get; set; }
 
         public decimal PriceFullYear { get; set; }
+
         [ForeignKey("DormitoryOwnerId")]
         public int? DormitoryOwnerId { get; set; }
         public DormitoryOwner DormitoryOwner { get; set; }
+
         [ForeignKey("AdministratorId")]
         public int? AdministratorId { get; set; }
 
@@ -49,7 +51,7 @@ namespace _4Dorms.Models
         public virtual ICollection<Booking> Bookings { get; set; }
 
         public virtual ICollection<FavoriteList> Favorites { get; set; }
-
+        public ICollection<DormitoryImage> ImageUrls { get; set; }
 
         public Dormitory()
         {
@@ -57,6 +59,7 @@ namespace _4Dorms.Models
             Reviews = new HashSet<Review>();
             Bookings = new HashSet<Booking>();
             Favorites = new HashSet<FavoriteList>();
+            ImageUrls = new HashSet<DormitoryImage>();
         }
     }
 }

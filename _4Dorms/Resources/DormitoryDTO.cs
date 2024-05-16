@@ -32,5 +32,11 @@ namespace _4Dorms.Resources
 
         [ForeignKey("DormitoryOwnerId")]
         public int? DormitoryOwnerId { get; set; }
+        public ICollection<string> ImageUrls { get; set; }
+
+        public DormitoryDTO()
+        {
+            ImageUrls = new List<string>();
+        }
     }
 }
