@@ -8,7 +8,8 @@ namespace _4Dorms.Repositories.Interfaces
         Task<UserType?> SignInAsync(SignInDTO signInData);
         Task<bool> UpdateProfileAsync(UserDTO updateData);
         Task<bool> DeleteUserProfileAsync(int userId, UserType userType);
-        Task<bool> CheckSignedInAsync();
+        void SignOut();
+        bool IsUserSignedIn();
     }
 }
 

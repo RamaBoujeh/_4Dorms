@@ -83,19 +83,38 @@
             }
         }
 
-        [HttpGet("check-signed-in")]
-        public async Task<IActionResult> CheckSignedIn()
+        [HttpPost("signout")]
+        public IActionResult SignOut()
         {
             try
             {
-                var result = await _userService.CheckSignedInAsync();
-                return Ok(result);
+                // Call the sign-out method in the user service
+                _userService.SignOut();
+                return Ok("User signed out successfully.");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
+                Console.WriteLine($"Error during sign-out: {ex.Message}");
+                return StatusCode(500, "An error occurred during sign-out.");
             }
         }
+
+        [HttpGet("is-user-signed-in")]
+        public IActionResult IsUserSignedIn()
+        {
+            try
+            {
+                // Call the IsUserSignedIn method in the user service
+                bool isSignedIn = _userService.IsUserSignedIn();
+                return Ok(isSignedIn);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error checking sign-in status: {ex.Message}");
+                return StatusCode(500, "An error occurred while checking sign-in status.");
+            }
+        }
+
 
         [HttpPost("send-verification-code")]
             public async Task<IActionResult> SendVerificationCode([FromBody] ForgotPasswordRequest request)

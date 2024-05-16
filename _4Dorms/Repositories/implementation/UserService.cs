@@ -15,6 +15,7 @@ namespace _4Dorms.Repositories.implementation
         private readonly IGenericRepository<Administrator> _administratorRepository;
         private readonly IGenericRepository<FavoriteList> _favoriteListRepository;
         private readonly IGenericRepository<Booking> _bookingRepository;
+        private bool _isUserSignedIn = false;
 
         public UserService(IGenericRepository<Student> studentRepository, IGenericRepository<DormitoryOwner> dormitoryOwnerRepository,
             IGenericRepository<Administrator> administratorRepository, IGenericRepository<FavoriteList> favoriteListRepository, IHttpContextAccessor httpContextAccessor)
@@ -114,18 +115,21 @@ namespace _4Dorms.Repositories.implementation
             var student = await _studentRepository.FindByConditionAsync(s => s.Email == signInData.Email && s.Password == signInData.Password);
             if (student != null)
             {
+                _isUserSignedIn = true;
                 return UserType.Student;
             }
 
             var dormitoryOwner = await _dormitoryOwnerRepository.FindByConditionAsync(d => d.Email == signInData.Email && d.Password == signInData.Password);
             if (dormitoryOwner != null)
             {
+                _isUserSignedIn = true;
                 return UserType.DormitoryOwner;
             }
 
             var administrator = await _administratorRepository.FindByConditionAsync(a => a.Email == signInData.Email && a.Password == signInData.Password);
             if (administrator != null)
             {
+                _isUserSignedIn = true;
                 return UserType.Administrator;
             }
 
@@ -133,14 +137,6 @@ namespace _4Dorms.Repositories.implementation
             return null;
         }
 
-        public async Task<bool> CheckSignedInAsync()
-        {
-            // Retrieve the user's identity from the HttpContext
-            var userIdentity = _httpContextAccessor.HttpContext.User.Identity;
-
-            // Check if the user is authenticated
-            return userIdentity.IsAuthenticated;
-        }
 
         public async Task<bool> UpdateProfileAsync(UserDTO updateData)
         {
@@ -225,6 +221,16 @@ namespace _4Dorms.Repositories.implementation
                 default:
                     return false;
             }
+        }
+
+        public void SignOut()
+        {
+            _isUserSignedIn = false;
+        }
+
+        public bool IsUserSignedIn()
+        {
+            return _isUserSignedIn;
         }
 
         public async Task<bool> DeleteUserProfileAsync(int userId, UserType userType)
