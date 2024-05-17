@@ -130,6 +130,30 @@ namespace _4Dorms.Repositories.implementation
             return null;
         }
 
+        public async Task<(object user, string userType)> AuthenticateAsync(string email, string password)
+        {
+            var student = await _studentRepository.StudentGetByEmailAndPasswordAsync(email, password);
+            if (student != null)
+            {
+                return (student, "Student");
+            }
+
+            var dormitoryOwner = await _dormitoryOwnerRepository.DormOwnerGetByEmailAndPasswordAsync(email, password);
+            if (dormitoryOwner != null)
+            {
+                return (dormitoryOwner, "DormitoryOwner");
+            }
+
+            var administrator = await _administratorRepository.AdminGetByEmailAndPasswordAsync(email, password);
+            if (administrator != null)
+            {
+                return (administrator, "Administrator");
+            }
+
+            return (null, null);
+        }
+
+
 
 
         public async Task<bool> UpdateProfileAsync(UserDTO updateData)
@@ -175,7 +199,6 @@ namespace _4Dorms.Repositories.implementation
         {
             student.Name = updateData.Name;
             student.Email = updateData.Email;
-            student.Password = updateData.Password;
             student.Gender = updateData.Gender;
             student.PhoneNumber = updateData.PhoneNumber;
             student.DateOfBirth = updateData.DateOfBirth;
@@ -186,8 +209,7 @@ namespace _4Dorms.Repositories.implementation
         private void MapToDormitoryOwner(UserDTO updateData, DormitoryOwner dormitoryOwner)
         {
             dormitoryOwner.Name = updateData.Name;
-            dormitoryOwner.Email = updateData.Email;
-            dormitoryOwner.Password = updateData.Password;
+            dormitoryOwner.Email = updateData.Email;    
             dormitoryOwner.Gender = updateData.Gender;
             dormitoryOwner.PhoneNumber = updateData.PhoneNumber;
             dormitoryOwner.DateOfBirth = updateData.DateOfBirth;
@@ -199,7 +221,6 @@ namespace _4Dorms.Repositories.implementation
             administrator.Name = updateData.Name;
             administrator.PhoneNumber = updateData.PhoneNumber;
             administrator.Email = updateData.Email;
-            administrator.Password = updateData.Password;
             administrator.ProfilePictureUrl = updateData.ProfilePictureUrl;
         }
 
@@ -255,9 +276,6 @@ namespace _4Dorms.Repositories.implementation
                     throw new ArgumentException("Invalid user type.");
             }
         }
-
-
-
 
         private async Task RemoveFavoriteListForUser(int favoriteListId, UserType userType)
         {
@@ -444,8 +462,6 @@ namespace _4Dorms.Repositories.implementation
                             Name = administrator.Name,
                             Email = administrator.Email,
                             PhoneNumber = administrator.PhoneNumber,
-                            Gender = administrator.Gender,
-                            DateOfBirth = administrator.DateOfBirth,
                             ProfilePictureUrl = administrator.ProfilePictureUrl,
                             UserType = UserType.Administrator
                         };

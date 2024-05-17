@@ -57,38 +57,68 @@ namespace _4Dorms.Controllers
         [HttpPost("sign-in")]
         public async Task<IActionResult> SignIn([FromBody] SignInDTO model)
         {
-            // Validate user credentials by checking against the database
-            var userType = await _userService.SignInAsync(model);
-            if (userType != null)
+            var (user, userType) = await _userService.AuthenticateAsync(model.Email, model.Password);
+            if (user != null)
             {
-                // Generate JWT token
                 var tokenHandler = new JwtSecurityTokenHandler();
-
-                // Generate key
                 var key = Encoding.ASCII.GetBytes("Rama-Issam-Boujeh-backend-project");
+
+                var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Email, model.Email),
+            new Claim(ClaimTypes.Role, userType) // Add user role as a claim
+        };
+
+                // Add specific claims based on user type
+                switch (user)
+                {
+                    case Student student:
+                        claims.Add(new Claim(ClaimTypes.NameIdentifier, student.StudentId.ToString()));
+                        claims.Add(new Claim(ClaimTypes.Name, student.Name));
+                        claims.Add(new Claim("PhoneNumber", student.PhoneNumber));
+                        claims.Add(new Claim("Gender", student.Gender));
+                        claims.Add(new Claim("DateOfBirth", student.DateOfBirth.ToString("o")));
+                        claims.Add(new Claim("Disabilities", student.Disabilities ?? string.Empty));
+                        claims.Add(new Claim("ProfilePictureUrl", student.ProfilePictureUrl ?? string.Empty));
+                        break;
+
+                    case DormitoryOwner dormitoryOwner:
+                        claims.Add(new Claim(ClaimTypes.NameIdentifier, dormitoryOwner.DormitoryOwnerId.ToString()));
+                        claims.Add(new Claim(ClaimTypes.Name, dormitoryOwner.Name));
+                        claims.Add(new Claim("PhoneNumber", dormitoryOwner.PhoneNumber));
+                        claims.Add(new Claim("Gender", dormitoryOwner.Gender));
+                        claims.Add(new Claim("DateOfBirth", dormitoryOwner.DateOfBirth.ToString("o")));
+                        claims.Add(new Claim("ProfilePictureUrl", dormitoryOwner.ProfilePictureUrl ?? string.Empty));
+                        break;
+
+                    case Administrator administrator:
+                        claims.Add(new Claim(ClaimTypes.NameIdentifier, administrator.AdministratorId.ToString()));
+                        claims.Add(new Claim(ClaimTypes.Name, administrator.Name));
+                        claims.Add(new Claim("PhoneNumber", administrator.PhoneNumber));
+                        claims.Add(new Claim("ProfilePictureUrl", administrator.ProfilePictureUrl ?? string.Empty));
+                        break;
+                }
 
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
-                    Subject = new ClaimsIdentity(new Claim[]
-                    {
-                new Claim(ClaimTypes.Email, model.Email),
-                new Claim(ClaimTypes.Role, userType.ToString()) // Add user role as a claim
-                    }),
+                    Subject = new ClaimsIdentity(claims),
                     Expires = DateTime.UtcNow.AddDays(7),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
                     Issuer = "YourIssuer",
                     Audience = "YourAudience"
                 };
+
                 var token = tokenHandler.CreateToken(tokenDescriptor);
                 var tokenString = tokenHandler.WriteToken(token);
 
                 // Return the token
-                return Ok(new { token = tokenString }); // Ensure the key matches what you're checking in the frontend
+                return Ok(new { token = tokenString });
             }
 
             // If no user is found or credentials are incorrect, return unauthorized
             return Unauthorized();
         }
+
 
         [HttpGet("check-signed-in")]
         [Authorize]
@@ -104,6 +134,26 @@ namespace _4Dorms.Controllers
                 return Ok(new { signedIn = false });
             }
         }
+
+        [HttpGet("profile")]
+        [Authorize]
+        public async Task<IActionResult> GetProfile()
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var userProfile = await _userService.GetProfileAsync(int.Parse(userId));
+            if (userProfile == null)
+            {
+                return NotFound("User profile not found.");
+            }
+
+            return Ok(userProfile);
+        }
+
 
 
         [HttpPost("send-verification-code")]
@@ -159,6 +209,31 @@ namespace _4Dorms.Controllers
             }
         }
 
+        [HttpPost("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO changePasswordData)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null || int.Parse(userId) != changePasswordData.UserId)
+            {
+                return Unauthorized();
+            }
+
+            bool success = await _userService.ChangePasswordAsync(changePasswordData);
+            if (success)
+            {
+                return Ok("Password changed successfully.");
+            }
+            else
+            {
+                return BadRequest("Failed to change password.");
+            }
+        }
 
 
         [HttpDelete("{userId}/{userType}")]

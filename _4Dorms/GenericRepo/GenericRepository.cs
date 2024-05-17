@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Linq;
+using _4Dorms.Models;
 
 
 namespace _4Dorms.GenericRepo
@@ -59,5 +60,21 @@ namespace _4Dorms.GenericRepo
         {
             return await _entities.Where(predicate).ToListAsync();
         }
+
+        public async Task<Student> StudentGetByEmailAndPasswordAsync(string email, string password)
+        {
+            return await _context.Students.FirstOrDefaultAsync(s => s.Email == email && s.Password == password);
+        }
+
+        public async Task<DormitoryOwner> DormOwnerGetByEmailAndPasswordAsync(string email, string password)
+        {
+            return await _context.DormitoryOwners.FirstOrDefaultAsync(d => d.Email == email && d.Password == password);
+        }
+
+        public async Task<Administrator> AdminGetByEmailAndPasswordAsync(string email, string password)
+        {
+            return await _context.Administrators.FirstOrDefaultAsync(a => a.Email == email && a.Password == password);
+        }
+
     }
 }

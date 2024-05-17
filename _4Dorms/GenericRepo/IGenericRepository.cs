@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using _4Dorms.Models;
+using System.Linq.Expressions;
 
 namespace _4Dorms.GenericRepo
 {
@@ -12,5 +13,8 @@ namespace _4Dorms.GenericRepo
         void Remove(int id);
         void Update(T entity);
         IQueryable<T> Query();
+        Task<Student> StudentGetByEmailAndPasswordAsync(string email, string password);
+        Task<DormitoryOwner> DormOwnerGetByEmailAndPasswordAsync(string email, string password);
+        Task<Administrator> AdminGetByEmailAndPasswordAsync(string email, string password);
     }
 }
