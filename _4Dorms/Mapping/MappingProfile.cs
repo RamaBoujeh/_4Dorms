@@ -19,6 +19,7 @@ namespace _4Dorms.Mapping
             CreateMap<Student, StudentDTO>().ReverseMap();
             CreateMap<SignUp, SignUpDTO>().ReverseMap();
             CreateMap<Dormitory, DormitorySearchDTO>().ReverseMap();
+            CreateMap<LogIn, SignInDTO>().ReverseMap();
         }
     }
 }

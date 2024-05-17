@@ -14,8 +14,6 @@ namespace _4Dorms.Repositories.implementation
         private readonly IGenericRepository<DormitoryOwner> _dormitoryOwnerRepository;
         private readonly IGenericRepository<Administrator> _administratorRepository;
         private readonly IGenericRepository<FavoriteList> _favoriteListRepository;
-        private readonly IGenericRepository<Booking> _bookingRepository;
-        private bool _isUserSignedIn = false;
 
         public UserService(IGenericRepository<Student> studentRepository, IGenericRepository<DormitoryOwner> dormitoryOwnerRepository,
             IGenericRepository<Administrator> administratorRepository, IGenericRepository<FavoriteList> favoriteListRepository, IHttpContextAccessor httpContextAccessor)
@@ -115,27 +113,23 @@ namespace _4Dorms.Repositories.implementation
             var student = await _studentRepository.FindByConditionAsync(s => s.Email == signInData.Email && s.Password == signInData.Password);
             if (student != null)
             {
-                _isUserSignedIn = true;
                 return UserType.Student;
             }
 
             var dormitoryOwner = await _dormitoryOwnerRepository.FindByConditionAsync(d => d.Email == signInData.Email && d.Password == signInData.Password);
             if (dormitoryOwner != null)
             {
-                _isUserSignedIn = true;
                 return UserType.DormitoryOwner;
             }
 
             var administrator = await _administratorRepository.FindByConditionAsync(a => a.Email == signInData.Email && a.Password == signInData.Password);
             if (administrator != null)
             {
-                _isUserSignedIn = true;
                 return UserType.Administrator;
             }
-
-            // If no user is found, return null or an appropriate value to indicate failure.
             return null;
         }
+
 
 
         public async Task<bool> UpdateProfileAsync(UserDTO updateData)
@@ -175,6 +169,7 @@ namespace _4Dorms.Repositories.implementation
 
             return await SaveChangesAsync(updateData.UserType);
         }
+
 
         private void MapToStudent(UserDTO updateData, Student student)
         {
@@ -221,16 +216,6 @@ namespace _4Dorms.Repositories.implementation
                 default:
                     return false;
             }
-        }
-
-        public void SignOut()
-        {
-            _isUserSignedIn = false;
-        }
-
-        public bool IsUserSignedIn()
-        {
-            return _isUserSignedIn;
         }
 
         public async Task<bool> DeleteUserProfileAsync(int userId, UserType userType)
@@ -300,7 +285,175 @@ namespace _4Dorms.Repositories.implementation
                     break;
             }
         }
+        //-------------------------------------------------------------------------------------
+        public async Task<UserDTO> GetProfileAsync(int userId)
+        {
+            var student = await _studentRepository.GetByIdAsync(userId);
+            if (student != null)
+            {
+                return MapToUserDTO(student);
+            }
 
+            var dormitoryOwner = await _dormitoryOwnerRepository.GetByIdAsync(userId);
+            if (dormitoryOwner != null)
+            {
+                return MapToUserDTO(dormitoryOwner);
+            }
+
+            var administrator = await _administratorRepository.GetByIdAsync(userId);
+            if (administrator != null)
+            {
+                return MapToUserDTO(administrator);
+            }
+
+            return null;
+        }
+
+        private UserDTO MapToUserDTO(Student student)
+        {
+            return new UserDTO
+            {
+                UserId = student.StudentId,
+                Name = student.Name,
+                Email = student.Email,
+                PhoneNumber = student.PhoneNumber,
+                Gender = student.Gender,
+                DateOfBirth = student.DateOfBirth,
+                Disabilities = student.Disabilities,
+                ProfilePictureUrl = student.ProfilePictureUrl,
+                UserType = UserType.Student
+            };
+        }
+
+        private UserDTO MapToUserDTO(DormitoryOwner dormitoryOwner)
+        {
+            return new UserDTO
+            {
+                UserId = dormitoryOwner.DormitoryOwnerId,
+                Name = dormitoryOwner.Name,
+                Email = dormitoryOwner.Email,
+                PhoneNumber = dormitoryOwner.PhoneNumber,
+                Gender = dormitoryOwner.Gender,
+                DateOfBirth = dormitoryOwner.DateOfBirth,
+                ProfilePictureUrl = dormitoryOwner.ProfilePictureUrl,
+                UserType = UserType.DormitoryOwner
+            };
+        }
+
+        private UserDTO MapToUserDTO(Administrator administrator)
+        {
+            return new UserDTO
+            {
+                UserId = administrator.AdministratorId,
+                Name = administrator.Name,
+                Email = administrator.Email,
+                PhoneNumber = administrator.PhoneNumber,
+                ProfilePictureUrl = administrator.ProfilePictureUrl,
+                UserType = UserType.Administrator
+            };
+        }
+
+        //--------------------------------------------------------------------
+        public async Task<bool> ChangePasswordAsync(ChangePasswordDTO changePasswordData)
+        {
+            switch (changePasswordData.UserType)
+            {
+                case UserType.Student:
+                    var student = await _studentRepository.GetByIdAsync(changePasswordData.UserId);
+                    if (student == null || student.Password != changePasswordData.OldPassword)
+                        return false;
+
+                    student.Password = changePasswordData.NewPassword;
+                    _studentRepository.Update(student);
+                    break;
+
+                case UserType.DormitoryOwner:
+                    var dormitoryOwner = await _dormitoryOwnerRepository.GetByIdAsync(changePasswordData.UserId);
+                    if (dormitoryOwner == null || dormitoryOwner.Password != changePasswordData.OldPassword)
+                        return false;
+
+                    dormitoryOwner.Password = changePasswordData.NewPassword;
+                    _dormitoryOwnerRepository.Update(dormitoryOwner);
+                    break;
+
+                case UserType.Administrator:
+                    var administrator = await _administratorRepository.GetByIdAsync(changePasswordData.UserId);
+                    if (administrator == null || administrator.Password != changePasswordData.OldPassword)
+                        return false;
+
+                    administrator.Password = changePasswordData.NewPassword;
+                    _administratorRepository.Update(administrator);
+                    break;
+
+                default:
+                    return false;
+            }
+
+            return await SaveChangesAsync(changePasswordData.UserType);
+        }
+
+        //-------------------------------------------------------------------------
+        public async Task<UserDTO> GetUserByEmailAsync(string email, UserType userType)
+        {
+            switch (userType)
+            {
+                case UserType.Student:
+                    var student = await _studentRepository.FindByConditionAsync(s => s.Email == email);
+                    if (student != null)
+                    {
+                        return new UserDTO
+                        {
+                            UserId = student.StudentId,
+                            Name = student.Name,
+                            Email = student.Email,
+                            PhoneNumber = student.PhoneNumber,
+                            Gender = student.Gender,
+                            DateOfBirth = student.DateOfBirth,
+                            Disabilities = student.Disabilities,
+                            ProfilePictureUrl = student.ProfilePictureUrl,
+                            UserType = UserType.Student
+                        };
+                    }
+                    break;
+
+                case UserType.DormitoryOwner:
+                    var dormitoryOwner = await _dormitoryOwnerRepository.FindByConditionAsync(d => d.Email == email);
+                    if (dormitoryOwner != null)
+                    {
+                        return new UserDTO
+                        {
+                            UserId = dormitoryOwner.DormitoryOwnerId,
+                            Name = dormitoryOwner.Name,
+                            Email = dormitoryOwner.Email,
+                            PhoneNumber = dormitoryOwner.PhoneNumber,
+                            Gender = dormitoryOwner.Gender,
+                            DateOfBirth = dormitoryOwner.DateOfBirth,
+                            ProfilePictureUrl = dormitoryOwner.ProfilePictureUrl,
+                            UserType = UserType.DormitoryOwner
+                        };
+                    }
+                    break;
+
+                case UserType.Administrator:
+                    var administrator = await _administratorRepository.FindByConditionAsync(a => a.Email == email);
+                    if (administrator != null)
+                    {
+                        return new UserDTO
+                        {
+                            UserId = administrator.AdministratorId,
+                            Name = administrator.Name,
+                            Email = administrator.Email,
+                            PhoneNumber = administrator.PhoneNumber,
+                            Gender = administrator.Gender,
+                            DateOfBirth = administrator.DateOfBirth,
+                            ProfilePictureUrl = administrator.ProfilePictureUrl,
+                            UserType = UserType.Administrator
+                        };
+                    }
+                    break;
+            }
+            return null;
+        }
 
     }
 }

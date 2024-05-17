@@ -15,6 +15,7 @@ namespace _4Dorms.Persistance
         public virtual DbSet<Room> Rooms { get; set; }
         public virtual DbSet<Student> Students { get; set; }
         public virtual DbSet<DormitoryImage> DormitoryImages { get; set; }  
+        public virtual DbSet<LogIn> LogIn { get; set; }
 
         public _4DormsDbContext(DbContextOptions<_4DormsDbContext> options) : base(options) { }
 

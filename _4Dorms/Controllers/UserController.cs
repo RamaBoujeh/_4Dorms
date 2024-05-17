@@ -2,8 +2,16 @@
     using _4Dorms.Repositories.Interfaces;
     using _4Dorms.Resources;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Authorization;
+    using System.IdentityModel.Tokens.Jwt;
+    using System.Linq;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.Text;
+using _4Dorms.Models;
+using System.Security.Cryptography;
 
-    namespace _4Dorms.Controllers
+namespace _4Dorms.Controllers
     {
         [ApiController]
         [Route("api/[Controller]")]
@@ -11,107 +19,89 @@
         {
             private readonly IUserService _userService;
             private readonly Dictionary<string, string> _verificationCodes;
-    
+            private readonly IHttpContextAccessor _httpContextAccessor;
 
-            public UserController(IUserService userService)
+        public UserController(IUserService userService, IHttpContextAccessor httpContextAccessor)
             {
                 _userService = userService;
                 _verificationCodes = new Dictionary<string, string>();
-            }
+                _httpContextAccessor = httpContextAccessor;
+        }
 
-            [HttpPost("signup")]
-            public async Task<IActionResult> SignUp([FromBody] SignUpDTO signUpData)
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                try
-                {
-                    var result = await _userService.SignUpAsync(signUpData);
-                    if (result)
-                    {
-                        return Ok("User signed up successfully.");
-                    }
-                    else
-                    {
-                        return StatusCode(500, "Failed to sign up user.");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error during sign-up: {ex.Message}");
-                    return StatusCode(500, "An error occurred during sign-up.");
-                }
-            }
-        [HttpPost("signin")]
-        public async Task<IActionResult> SignIn([FromBody] SignInDTO signInData)
+        [HttpPost("signup")]
+        public async Task<IActionResult> SignUp([FromBody] SignUpDTO signUpData)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var userType = await _userService.SignInAsync(signInData);
-
-            if (userType.HasValue)
+            try
             {
-                // Determine the appropriate redirection based on the user type
-                switch (userType)
+                var result = await _userService.SignUpAsync(signUpData);
+                if (result)
                 {
-                    case UserType.Student:
-                        // Redirect to the student page
-                        return Ok("User signed in successfully as a student.");
-
-                    case UserType.DormitoryOwner:
-                        // Redirect to the dormitory owner page
-                        return Ok("User signed in successfully as a dormitory owner.");
-
-                    case UserType.Administrator:
-                        // Redirect to the administrator page
-                        return Ok("User signed in successfully as an administrator.");
-
-                    default:
-                        // Unexpected user type (shouldn't happen)
-                        return BadRequest("Invalid user type.");
+                    return Ok("User signed up successfully.");
                 }
+                else
+                {
+                    return StatusCode(500, "Failed to sign up user.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during sign-up: {ex.Message}");
+                return StatusCode(500, "An error occurred during sign-up.");
+            }
+        }
+        [HttpPost("sign-in")]
+        public async Task<IActionResult> SignIn([FromBody] SignInDTO model)
+        {
+            // Validate user credentials by checking against the database
+            var userType = await _userService.SignInAsync(model);
+            if (userType != null)
+            {
+                // Generate JWT token
+                var tokenHandler = new JwtSecurityTokenHandler();
+
+                // Generate key
+                var key = Encoding.ASCII.GetBytes("Rama-Issam-Boujeh-backend-project");
+
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new Claim[]
+                    {
+                new Claim(ClaimTypes.Email, model.Email),
+                new Claim(ClaimTypes.Role, userType.ToString()) // Add user role as a claim
+                    }),
+                    Expires = DateTime.UtcNow.AddDays(7),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+                    Issuer = "YourIssuer",
+                    Audience = "YourAudience"
+                };
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                var tokenString = tokenHandler.WriteToken(token);
+
+                // Return the token
+                return Ok(new { token = tokenString }); // Ensure the key matches what you're checking in the frontend
+            }
+
+            // If no user is found or credentials are incorrect, return unauthorized
+            return Unauthorized();
+        }
+
+        [HttpGet("check-signed-in")]
+        [Authorize]
+        public IActionResult CheckSignedIn()
+        {
+            // Check if the user is authenticated
+            if (User.Identity.IsAuthenticated)
+            {
+                return Ok(new { signedIn = true });
             }
             else
             {
-                return Unauthorized("Invalid email or password.");
-            }
-        }
-
-        [HttpPost("signout")]
-        public IActionResult SignOut()
-        {
-            try
-            {
-                // Call the sign-out method in the user service
-                _userService.SignOut();
-                return Ok("User signed out successfully.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error during sign-out: {ex.Message}");
-                return StatusCode(500, "An error occurred during sign-out.");
-            }
-        }
-
-        [HttpGet("is-user-signed-in")]
-        public IActionResult IsUserSignedIn()
-        {
-            try
-            {
-                // Call the IsUserSignedIn method in the user service
-                bool isSignedIn = _userService.IsUserSignedIn();
-                return Ok(isSignedIn);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error checking sign-in status: {ex.Message}");
-                return StatusCode(500, "An error occurred while checking sign-in status.");
+                return Ok(new { signedIn = false });
             }
         }
 
@@ -149,26 +139,29 @@
                 return random.Next(100000, 999999).ToString();
             }
 
-            [HttpPost("update-profile")]
-            public async Task<IActionResult> UpdateProfile([FromBody] UserDTO updateData)
+        [HttpPost("update-profile")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfile([FromBody] UserDTO updateData)
+        {
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                bool success = await _userService.UpdateProfileAsync(updateData);
-                if (success)
-                {
-                    return Ok("Profile updated successfully.");
-                }
-                else
-                {
-                    return BadRequest("Failed to update profile.");
-                }
+                return BadRequest(ModelState);
             }
 
-            [HttpDelete("{userId}/{userType}")]
+            bool success = await _userService.UpdateProfileAsync(updateData);
+            if (success)
+            {
+                return Ok("Profile updated successfully.");
+            }
+            else
+            {
+                return BadRequest("Failed to update profile.");
+            }
+        }
+
+
+
+        [HttpDelete("{userId}/{userType}")]
             public async Task<IActionResult> DeleteUser(int userId, UserType userType)
             {
                 var result = await _userService.DeleteUserProfileAsync(userId, userType);
