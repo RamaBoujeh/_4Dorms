@@ -59,7 +59,7 @@ namespace _4Dorms.Models
             Reviews = new HashSet<Review>();
             Bookings = new HashSet<Booking>();
             Favorites = new HashSet<FavoriteList>();
-            ImageUrls = new HashSet<DormitoryImage>();
+            ImageUrls = new HashSet<DormitoryImage  >();
         }
     }
 }

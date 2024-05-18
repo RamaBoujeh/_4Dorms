@@ -14,8 +14,10 @@ namespace _4Dorms.Controllers
             _administratorService = administratorService;
         }
 
-        [HttpPut("{dormitoryId}")]
-        public async Task<IActionResult> ReviewDormitory(int dormitoryId, bool approved, int administratorId)
+        
+
+        [HttpPut("review/{dormitoryId}")]
+        public async Task<IActionResult> ReviewDormitory(int dormitoryId, bool approved, [FromBody] int administratorId)
         {
             try
             {

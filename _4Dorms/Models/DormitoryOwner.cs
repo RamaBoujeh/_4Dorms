@@ -22,6 +22,7 @@ namespace _4Dorms.Models
         [DataType(DataType.Date)]
         public DateTime DateOfBirth { get; set; }
         public string ProfilePictureUrl { get; set; }
+        public virtual ICollection<FavoriteList> Favorites { get; set; }
 
         public virtual ICollection<Dormitory> Dormitories { get; set; }
 
@@ -29,6 +30,7 @@ namespace _4Dorms.Models
 
         public DormitoryOwner()
         {
+            Favorites = new HashSet<FavoriteList>();
             Dormitories = new HashSet<Dormitory>();
             Bookings = new HashSet<Booking>();
         }

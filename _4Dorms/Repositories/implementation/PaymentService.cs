@@ -1,6 +1,7 @@
 ﻿using _4Dorms.GenericRepo;
 using _4Dorms.Models;
 using _4Dorms.Repositories.Interfaces;
+using _4Dorms.Resources;
 
 namespace _4Dorms.Repositories.implementation
 {
@@ -13,15 +14,26 @@ namespace _4Dorms.Repositories.implementation
             _paymentGateRepository = paymentGateRepository;
         }
 
-        public Task<bool> ProcessPayment(int cardNumber, DateTime expirationDate, int cvv, decimal amount)
+        public Task<bool> ProcessPaymentAsync(PaymentGateDTO paymentDto)
         {
             // Emulated payment processing logic
-            if (expirationDate > DateTime.Now && cvv.ToString().Length == 3)
+            if (IsValidPaymentData(paymentDto))
             {
                 // Simulate a successful payment process
                 return Task.FromResult(true);
             }
             return Task.FromResult(false);
+        }
+
+        private bool IsValidPaymentData(PaymentGateDTO paymentDto)
+        {
+            // Add validation logic here
+            if (paymentDto.ExpirationDate > DateTime.Now && paymentDto.CVV.ToString().Length == 3)
+            {
+                // Assume valid if expiration date is in the future and CVV is 3 digits
+                return true;
+            }
+            return false;
         }
 
     }

@@ -18,12 +18,12 @@ namespace _4Dorms.Controllers
         [HttpPost("process")]
         public async Task<IActionResult> ProcessPayment(PaymentGateDTO paymentDto)
         {
-            var result = await _paymentService.ProcessPayment(paymentDto.CardNumber, paymentDto.ExpirationDate, paymentDto.CVV, paymentDto.Amount);
+            var result = await _paymentService.ProcessPaymentAsync(paymentDto);
             if (result)
             {
                 return Ok(new { Message = "Payment processed successfully." });
             }
-            return BadRequest(new { Message = "Payment processing failed." });
+            return BadRequest(new { Message = "Payment processing failed. Please check your payment information." });
         }
     }
 }

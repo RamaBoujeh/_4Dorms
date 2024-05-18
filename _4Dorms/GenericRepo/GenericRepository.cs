@@ -28,16 +28,24 @@ namespace _4Dorms.GenericRepo
             return await _entities.FindAsync(id);
         }
 
-        public async void Add(T entity)
+        public async Task Add(T entity)
         {
-            _entities.Add(entity);
+            await _entities.AddAsync(entity);
         }
+
         public void Remove(int id)
         {
             var entityToRemove = _entities.Find(id);
-            _entities.Remove(entityToRemove);
+            if (entityToRemove != null)
+            {
+                _entities.Remove(entityToRemove);
+            }
         }
 
+        public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _entities.AnyAsync(predicate);
+        }
         public async Task<bool> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync().ConfigureAwait(false) > 0;

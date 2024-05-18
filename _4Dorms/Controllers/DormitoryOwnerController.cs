@@ -1,7 +1,9 @@
 ﻿using _4Dorms.Models;
 using _4Dorms.Repositories.Interfaces;
 using _4Dorms.Resources;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace _4Dorms.Controllers
 {
@@ -16,18 +18,21 @@ namespace _4Dorms.Controllers
             _dormitoryOwnerService = dormitoryOwnerService;
         }
 
+        [Authorize(Roles = "DormitoryOwner")]
         [HttpPost("submit-dormitory")]
-        public async Task<IActionResult> SubmitDormitoryForApproval([FromBody] DormitoryDTO dormitoryDTO, int dormitoryOwnerId)
+        public async Task<IActionResult> SubmitDormitoryForApproval([FromBody] DormitoryDTO dormitoryDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            await _dormitoryOwnerService.SubmitDormitoryForApprovalAsync(dormitoryDTO, dormitoryOwnerId);
+            var userId = int.Parse(User.FindFirst("UserId").Value);
+            await _dormitoryOwnerService.SubmitDormitoryForApprovalAsync(dormitoryDTO, userId);
             return Ok("Dormitory submitted for approval successfully");
         }
 
+        [Authorize(Roles = "DormitoryOwner")]
         [HttpPut("update-dormitory/{dormitoryId}")]
         public async Task<IActionResult> UpdateDormitory(int dormitoryId, [FromBody] DormitoryDTO updatedDormitoryDTO)
         {
@@ -47,6 +52,7 @@ namespace _4Dorms.Controllers
             }
         }
 
+        [Authorize(Roles = "DormitoryOwner")]
         [HttpDelete("delete-dormitory/{dormitoryId}")]
         public async Task<IActionResult> DeleteDormitory(int dormitoryId)
         {

@@ -45,7 +45,7 @@ namespace _4Dorms.Controllers
                 }
                 else
                 {
-                    return StatusCode(500, "Failed to sign up user.");
+                    return BadRequest("Failed to sign up user. The email is already in use.");
                 }
             }
             catch (Exception ex)
@@ -54,6 +54,7 @@ namespace _4Dorms.Controllers
                 return StatusCode(500, "An error occurred during sign-up.");
             }
         }
+
         [HttpPost("sign-in")]
         public async Task<IActionResult> SignIn([FromBody] SignInDTO model)
         {
@@ -89,6 +90,7 @@ namespace _4Dorms.Controllers
                         claims.Add(new Claim("Gender", dormitoryOwner.Gender));
                         claims.Add(new Claim("DateOfBirth", dormitoryOwner.DateOfBirth.ToString("o")));
                         claims.Add(new Claim("ProfilePictureUrl", dormitoryOwner.ProfilePictureUrl ?? string.Empty));
+                        claims.Add(new Claim("DormitoryOwnerId", dormitoryOwner.DormitoryOwnerId.ToString()));
                         break;
 
                     case Administrator administrator:

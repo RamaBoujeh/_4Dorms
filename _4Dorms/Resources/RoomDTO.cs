@@ -4,9 +4,9 @@ namespace _4Dorms.Resources
 {
     public class RoomDTO
     {
-        public string Amenities { get; set; }
-        public decimal Price { get; set; }
-        public int RoomNumber { get; set; }
-        public int DormitoryId { get; set; }
+        public bool? privateRoom { get; set; }
+        public bool? SharedRoom { get; set; }
+        public int? NumOfprivateRooms { get; set; }
+        public int? NumOfSharedRooms { get; set; }
     }
 }

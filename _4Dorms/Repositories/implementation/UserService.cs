@@ -29,6 +29,12 @@ namespace _4Dorms.Repositories.implementation
         {
             try
             {
+                // Check if the email already exists in the database
+                if (await IsEmailExistsAsync(signUpData.Email))
+                {
+                    return false; // Email already exists, return false
+                }
+
                 switch (signUpData.UserType)
                 {
                     case UserType.Student:
@@ -57,6 +63,15 @@ namespace _4Dorms.Repositories.implementation
                 return false;
             }
         }
+
+        private async Task<bool> IsEmailExistsAsync(string email)
+        {
+            // Check if the email exists in any of the user tables (Student, DormitoryOwner, Administrator)
+            return await _studentRepository.AnyAsync(s => s.Email == email) ||
+                   await _dormitoryOwnerRepository.AnyAsync(d => d.Email == email) ||
+                   await _administratorRepository.AnyAsync(a => a.Email == email);
+        }
+
 
         private async Task CreateEmptyFavoriteListForUser(int userId, UserType userType)
         {
@@ -209,7 +224,7 @@ namespace _4Dorms.Repositories.implementation
         private void MapToDormitoryOwner(UserDTO updateData, DormitoryOwner dormitoryOwner)
         {
             dormitoryOwner.Name = updateData.Name;
-            dormitoryOwner.Email = updateData.Email;    
+            dormitoryOwner.Email = updateData.Email;
             dormitoryOwner.Gender = updateData.Gender;
             dormitoryOwner.PhoneNumber = updateData.PhoneNumber;
             dormitoryOwner.DateOfBirth = updateData.DateOfBirth;
@@ -248,7 +263,7 @@ namespace _4Dorms.Repositories.implementation
                     if (student == null)
                         return false;
 
-                    await RemoveFavoriteListForUser(userId, UserType.Student);
+                    await RemoveFavoriteListsForUser(userId, UserType.Student);
 
                     _studentRepository.Remove(userId);
                     return await _studentRepository.SaveChangesAsync();
@@ -258,7 +273,7 @@ namespace _4Dorms.Repositories.implementation
                     if (dormitoryOwner == null)
                         return false;
 
-                    await RemoveFavoriteListForUser(userId, UserType.DormitoryOwner);
+                    await RemoveFavoriteListsForUser(userId, UserType.DormitoryOwner);
 
                     _dormitoryOwnerRepository.Remove(userId);
                     return await _dormitoryOwnerRepository.SaveChangesAsync();
@@ -268,7 +283,6 @@ namespace _4Dorms.Repositories.implementation
                     if (administrator == null)
                         return false;
 
-
                     _administratorRepository.Remove(userId);
                     return await _administratorRepository.SaveChangesAsync();
 
@@ -277,32 +291,40 @@ namespace _4Dorms.Repositories.implementation
             }
         }
 
-        private async Task RemoveFavoriteListForUser(int favoriteListId, UserType userType)
+        private async Task RemoveFavoriteListsForUser(int userId, UserType userType)
         {
+            ICollection<FavoriteList> favoriteLists = null;
+
             switch (userType)
             {
                 case UserType.Student:
-                    var studentFavoriteList = await _favoriteListRepository.GetByIdAsync(favoriteListId);
-                    if (studentFavoriteList != null)
+                    var student = await _studentRepository.GetByIdAsync(userId);
+                    if (student != null)
                     {
-                        _favoriteListRepository.Remove(favoriteListId);
-                        await _favoriteListRepository.SaveChangesAsync();
+                        favoriteLists = student.Favorites;
                     }
                     break;
 
                 case UserType.DormitoryOwner:
-                    var dormitoryOwnerFavoriteList = await _favoriteListRepository.GetByIdAsync(favoriteListId);
-                    if (dormitoryOwnerFavoriteList != null)
+                    var dormitoryOwner = await _dormitoryOwnerRepository.GetByIdAsync(userId);
+                    if (dormitoryOwner != null)
                     {
-                        _favoriteListRepository.Remove(favoriteListId);
-                        await _favoriteListRepository.SaveChangesAsync();
+                        favoriteLists = dormitoryOwner.Favorites;
                     }
                     break;
+            }
 
-                default:
-                    break;
+            if (favoriteLists != null)
+            {
+                foreach (var favoriteList in favoriteLists)
+                {
+                    _favoriteListRepository.Remove(favoriteList.FavoriteId);
+                }
+                await _favoriteListRepository.SaveChangesAsync();
             }
         }
+
+
         //-------------------------------------------------------------------------------------
         public async Task<UserDTO> GetProfileAsync(int userId)
         {
@@ -470,7 +492,6 @@ namespace _4Dorms.Repositories.implementation
             }
             return null;
         }
-
     }
 }
 

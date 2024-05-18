@@ -1,7 +1,9 @@
-﻿namespace _4Dorms.Repositories.Interfaces
+﻿using _4Dorms.Resources;
+
+namespace _4Dorms.Repositories.Interfaces
 {
     public interface IPaymentService
     {
-        Task<bool> ProcessPayment(int cardNumber, DateTime expirationDate, int cvv, decimal amount);
+        Task<bool> ProcessPaymentAsync(PaymentGateDTO paymentDto);
     }
 }

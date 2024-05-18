@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Options;
+using _4Dorms.Repositories.Implementation;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
