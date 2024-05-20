@@ -15,6 +15,10 @@ namespace _4Dorms.Models
         public int BookingId { get; set; }
         [ForeignKey("RoomId")]
         public int? RoomId { get; set; }
+        [ForeignKey("StudentId")]
+        public int StudentId { get; set; }
+        public Student Student { get; set; }
+
         [ForeignKey("DormitoryId")]
         public int? DormitoryId { get; set; }
         public Dormitory Dormitory { get; set; }

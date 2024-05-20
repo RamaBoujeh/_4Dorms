@@ -13,8 +13,8 @@ namespace _4Dorms.Resources
         public string GenderType { get; set; }
         public string City { get; set; }
         public string NearbyUniversity { get; set; }
-        [Phone]
-        public int Phone { get; set; }
+        [Phone] 
+        public string Phone { get; set; }
         [EmailAddress]
         public string Email { get; set; }
         public string DormitoryDescription { get; set; }

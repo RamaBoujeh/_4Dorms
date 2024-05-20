@@ -3,6 +3,7 @@ using _4Dorms.Repositories.Interfaces;
 using _4Dorms.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace _4Dorms.Controllers
@@ -12,10 +13,12 @@ namespace _4Dorms.Controllers
     public class DormitoryOwnerController : ControllerBase
     {
         private readonly IDormitoryOwnerService _dormitoryOwnerService;
+        private readonly ILogger<DormitoryOwnerController> _logger;
 
-        public DormitoryOwnerController(IDormitoryOwnerService dormitoryOwnerService)
+        public DormitoryOwnerController(IDormitoryOwnerService dormitoryOwnerService, ILogger<DormitoryOwnerController> logger)
         {
             _dormitoryOwnerService = dormitoryOwnerService;
+            _logger = logger;
         }
 
         [Authorize(Roles = "DormitoryOwner")]
@@ -27,10 +30,26 @@ namespace _4Dorms.Controllers
                 return BadRequest(ModelState);
             }
 
-            var userId = int.Parse(User.FindFirst("UserId").Value);
+            var userIdClaim = User.FindFirst("DormitoryOwnerId");
+            if (userIdClaim == null)
+            {
+                _logger.LogError("DormitoryOwnerId claim not found in token");
+                return Unauthorized("DormitoryOwnerId claim not found");
+            }
+
+            var userId = int.Parse(userIdClaim.Value);
+
+            _logger.LogInformation("Submitting dormitory for approval. UserId: {UserId}, Dormitory: {Dormitory}", userId, dormitoryDTO);
+
             await _dormitoryOwnerService.SubmitDormitoryForApprovalAsync(dormitoryDTO, userId);
+
             return Ok("Dormitory submitted for approval successfully");
         }
+
+
+
+
+
 
         [Authorize(Roles = "DormitoryOwner")]
         [HttpPut("update-dormitory/{dormitoryId}")]

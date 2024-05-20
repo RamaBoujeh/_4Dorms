@@ -20,8 +20,8 @@ namespace _4Dorms.Repositories.implementation
 
         public async Task<bool> AddReviewAsync(int dormitoryId, int studentId, int rating, string comment)
         {
-            // Check if the student has booked the specified dormitory
-            var booking = await _BookingRepository.FindByConditionAsync(b => b.DormitoryId == dormitoryId);
+            // Check if the student has an approved booking for the specified dormitory
+            var booking = await _BookingRepository.FindByConditionAsync(b => b.DormitoryId == dormitoryId && b.StudentId == studentId && b.Status == Status.Approved);
             if (booking == null)
             {
                 _logger.LogWarning($"Student with ID {studentId} cannot leave a review for dormitory with ID {dormitoryId} as they haven't booked it.");
@@ -39,8 +39,7 @@ namespace _4Dorms.Repositories.implementation
                     Date = DateTime.UtcNow
                 };
 
-                _ReviewRepository.Add(review);
-
+                await _ReviewRepository.Add(review);
                 await _ReviewRepository.SaveChangesAsync();
 
                 return true;
@@ -51,6 +50,7 @@ namespace _4Dorms.Repositories.implementation
                 return false;
             }
         }
-    
+
+
     }
 }

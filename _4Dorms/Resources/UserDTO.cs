@@ -12,7 +12,7 @@
         public string Gender { get; set; }
         public DateTime DateOfBirth { get; set; }
         public string? Disabilities { get; set; }
-        public string ProfilePictureUrl { get; set; }
+        public string? ProfilePictureUrl { get; set; }
 
     }
 }

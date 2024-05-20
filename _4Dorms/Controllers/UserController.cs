@@ -13,19 +13,19 @@ using System.Security.Cryptography;
 
 namespace _4Dorms.Controllers
     {
-        [ApiController]
-        [Route("api/[Controller]")]
-        public class UserController : ControllerBase
-        {
-            private readonly IUserService _userService;
-            private readonly Dictionary<string, string> _verificationCodes;
-            private readonly IHttpContextAccessor _httpContextAccessor;
+    [ApiController]
+    [Route("api/[Controller]")]
+    public class UserController : ControllerBase
+    {
+        private readonly IUserService _userService;
+        private readonly Dictionary<string, string> _verificationCodes;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public UserController(IUserService userService, IHttpContextAccessor httpContextAccessor)
-            {
-                _userService = userService;
-                _verificationCodes = new Dictionary<string, string>();
-                _httpContextAccessor = httpContextAccessor;
+        {
+            _userService = userService;
+            _verificationCodes = new Dictionary<string, string>();
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpPost("signup")]
@@ -54,7 +54,6 @@ namespace _4Dorms.Controllers
                 return StatusCode(500, "An error occurred during sign-up.");
             }
         }
-
         [HttpPost("sign-in")]
         public async Task<IActionResult> SignIn([FromBody] SignInDTO model)
         {
@@ -67,15 +66,15 @@ namespace _4Dorms.Controllers
                 var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Email, model.Email),
-            new Claim(ClaimTypes.Role, userType) // Add user role as a claim
+            new Claim(ClaimTypes.Role, userType)
         };
 
                 // Add specific claims based on user type
                 switch (user)
                 {
                     case Student student:
-                        claims.Add(new Claim(ClaimTypes.NameIdentifier, student.StudentId.ToString()));
-                        claims.Add(new Claim(ClaimTypes.Name, student.Name));
+                        claims.Add(new Claim("StudentId", student.StudentId.ToString()));
+                        claims.Add(new Claim("Name", student.Name));
                         claims.Add(new Claim("PhoneNumber", student.PhoneNumber));
                         claims.Add(new Claim("Gender", student.Gender));
                         claims.Add(new Claim("DateOfBirth", student.DateOfBirth.ToString("o")));
@@ -84,18 +83,17 @@ namespace _4Dorms.Controllers
                         break;
 
                     case DormitoryOwner dormitoryOwner:
-                        claims.Add(new Claim(ClaimTypes.NameIdentifier, dormitoryOwner.DormitoryOwnerId.ToString()));
-                        claims.Add(new Claim(ClaimTypes.Name, dormitoryOwner.Name));
+                        claims.Add(new Claim("DormitoryOwnerId", dormitoryOwner.DormitoryOwnerId.ToString()));
+                        claims.Add(new Claim("Name", dormitoryOwner.Name));
                         claims.Add(new Claim("PhoneNumber", dormitoryOwner.PhoneNumber));
                         claims.Add(new Claim("Gender", dormitoryOwner.Gender));
                         claims.Add(new Claim("DateOfBirth", dormitoryOwner.DateOfBirth.ToString("o")));
                         claims.Add(new Claim("ProfilePictureUrl", dormitoryOwner.ProfilePictureUrl ?? string.Empty));
-                        claims.Add(new Claim("DormitoryOwnerId", dormitoryOwner.DormitoryOwnerId.ToString()));
                         break;
 
                     case Administrator administrator:
-                        claims.Add(new Claim(ClaimTypes.NameIdentifier, administrator.AdministratorId.ToString()));
-                        claims.Add(new Claim(ClaimTypes.Name, administrator.Name));
+                        claims.Add(new Claim("AdministratorId", administrator.AdministratorId.ToString()));
+                        claims.Add(new Claim("Name", administrator.Name));
                         claims.Add(new Claim("PhoneNumber", administrator.PhoneNumber));
                         claims.Add(new Claim("ProfilePictureUrl", administrator.ProfilePictureUrl ?? string.Empty));
                         break;
@@ -113,11 +111,9 @@ namespace _4Dorms.Controllers
                 var token = tokenHandler.CreateToken(tokenDescriptor);
                 var tokenString = tokenHandler.WriteToken(token);
 
-                // Return the token
                 return Ok(new { token = tokenString });
             }
 
-            // If no user is found or credentials are incorrect, return unauthorized
             return Unauthorized();
         }
 

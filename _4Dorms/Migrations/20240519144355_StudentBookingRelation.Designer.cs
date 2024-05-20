@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using _4Dorms.Persistance;
 
@@ -11,9 +12,11 @@ using _4Dorms.Persistance;
 namespace _4Dorms.Migrations
 {
     [DbContext(typeof(_4DormsDbContext))]
-    partial class _4DormsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240519144355_StudentBookingRelation")]
+    partial class StudentBookingRelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -67,7 +70,7 @@ namespace _4Dorms.Migrations
 
                     b.HasKey("AdministratorId");
 
-                    b.ToTable("Administrators", (string)null);
+                    b.ToTable("Administrators");
 
                     b.HasData(
                         new
@@ -125,7 +128,7 @@ namespace _4Dorms.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("DormitoriesBooking", (string)null);
+                    b.ToTable("DormitoriesBooking");
                 });
 
             modelBuilder.Entity("_4Dorms.Models.Dormitory", b =>
@@ -190,7 +193,7 @@ namespace _4Dorms.Migrations
 
                     b.HasIndex("DormitoryOwnerId");
 
-                    b.ToTable("Dormitories", (string)null);
+                    b.ToTable("Dormitories");
                 });
 
             modelBuilder.Entity("_4Dorms.Models.DormitoryImage", b =>
@@ -212,7 +215,7 @@ namespace _4Dorms.Migrations
 
                     b.HasIndex("DormitoryId");
 
-                    b.ToTable("DormitoryImages", (string)null);
+                    b.ToTable("DormitoryImages");
                 });
 
             modelBuilder.Entity("_4Dorms.Models.DormitoryOwner", b =>
@@ -252,7 +255,7 @@ namespace _4Dorms.Migrations
 
                     b.HasKey("DormitoryOwnerId");
 
-                    b.ToTable("DormitoryOwners", (string)null);
+                    b.ToTable("DormitoryOwners");
                 });
 
             modelBuilder.Entity("_4Dorms.Models.FavoriteList", b =>
@@ -275,7 +278,7 @@ namespace _4Dorms.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("FavoriteLists", (string)null);
+                    b.ToTable("FavoriteLists");
                 });
 
             modelBuilder.Entity("_4Dorms.Models.LogIn", b =>
@@ -296,7 +299,7 @@ namespace _4Dorms.Migrations
 
                     b.HasKey("LoginId");
 
-                    b.ToTable("LogIn", (string)null);
+                    b.ToTable("LogIn");
                 });
 
             modelBuilder.Entity("_4Dorms.Models.PaymentGate", b =>
@@ -324,7 +327,7 @@ namespace _4Dorms.Migrations
 
                     b.HasKey("PaymentGateId");
 
-                    b.ToTable("PaymentGateways", (string)null);
+                    b.ToTable("PaymentGateways");
                 });
 
             modelBuilder.Entity("_4Dorms.Models.Review", b =>
@@ -358,7 +361,7 @@ namespace _4Dorms.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Reviews", (string)null);
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("_4Dorms.Models.Room", b =>
@@ -388,7 +391,7 @@ namespace _4Dorms.Migrations
 
                     b.HasIndex("DormitoryId");
 
-                    b.ToTable("Rooms", (string)null);
+                    b.ToTable("Rooms");
                 });
 
             modelBuilder.Entity("_4Dorms.Models.Student", b =>
@@ -432,7 +435,7 @@ namespace _4Dorms.Migrations
 
                     b.HasKey("StudentId");
 
-                    b.ToTable("Students", (string)null);
+                    b.ToTable("Students");
                 });
 
             modelBuilder.Entity("DormitoryFavoriteList", b =>

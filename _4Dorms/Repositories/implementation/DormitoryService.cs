@@ -2,6 +2,7 @@
 using _4Dorms.Models;
 using _4Dorms.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Data.Entity;
 
 namespace _4Dorms.Repositories.implementation
 {
@@ -51,6 +52,12 @@ namespace _4Dorms.Repositories.implementation
                 query = query.Where(d => d.GenderType == genderType);
 
             return await query.ToListAsync();
+        }
+
+        public async Task<List<Dormitory>> GetDormsByStatusAsync(DormitoryStatus status)
+        {
+            return await _genericRepositoryDorm.GetListByConditionAsync(d => d.Status == status);
+                
         }
 
     }

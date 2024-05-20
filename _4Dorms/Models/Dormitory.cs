@@ -21,7 +21,7 @@ namespace _4Dorms.Models
         public string City { get; set; }
         public string NearbyUniversity { get; set; }
         [Phone]
-        public int phone {  get; set; }
+        public string phone {  get; set; }
         [EmailAddress]
         public string Email { get; set; }
         public string DormitoryDescription { get; set;}
@@ -51,7 +51,7 @@ namespace _4Dorms.Models
         public virtual ICollection<Booking> Bookings { get; set; }
 
         public virtual ICollection<FavoriteList> Favorites { get; set; }
-        public ICollection<DormitoryImage> ImageUrls { get; set; }
+        public ICollection<DormitoryImage>? ImageUrls { get; set; }
 
         public Dormitory()
         {

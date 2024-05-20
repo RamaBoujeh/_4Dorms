@@ -18,21 +18,32 @@ namespace _4Dorms.Controllers
         }
 
         [HttpPost("add")]
-        public async Task<IActionResult> AddReview(ReviewDTO reviewDTO)
+        public async Task<IActionResult> AddReview([FromBody] ReviewDTO reviewDTO)
         {
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning("Invalid review model state.");
                 return BadRequest(ModelState);
             }
 
-            var result = await _reviewService.AddReviewAsync(reviewDTO.DormitoryId, reviewDTO.StudentId, reviewDTO.Rating, reviewDTO.Comment);
-            if (result)
+            try
             {
-                return Ok("Review added successfully.");
+                var result = await _reviewService.AddReviewAsync(reviewDTO.DormitoryId, reviewDTO.StudentId, reviewDTO.Rating, reviewDTO.Comment);
+                if (result)
+                {
+                    _logger.LogInformation("Review added successfully.");
+                    return Ok("Review added successfully.");
+                }
+                else
+                {
+                    _logger.LogError("Failed to add review.");
+                    return StatusCode(500, "Failed to add review. Please try again later.");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return StatusCode(500, "Failed to add review. Please try again later.");
+                _logger.LogError($"Exception while adding review: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
     }

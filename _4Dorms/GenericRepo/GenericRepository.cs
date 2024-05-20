@@ -84,5 +84,10 @@ namespace _4Dorms.GenericRepo
             return await _context.Administrators.FirstOrDefaultAsync(a => a.Email == email && a.Password == password);
         }
 
+        public async Task<List<T>> GetListByConditionAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _entities.Where(predicate).ToListAsync();
+        }
+
     }
 }

@@ -1,4 +1,6 @@
-﻿using _4Dorms.Repositories.Interfaces;
+﻿using _4Dorms.Models;
+using _4Dorms.Repositories.implementation;
+using _4Dorms.Repositories.Interfaces;
 using _4Dorms.Resources;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,9 +11,11 @@ namespace _4Dorms.Controllers
     public class AdministratorController : ControllerBase
     {
         private readonly IAdministratorService _administratorService;
-        public AdministratorController(IAdministratorService administratorService)
+        private readonly IDormitoryService _dormitoryService;
+        public AdministratorController(IAdministratorService administratorService, IDormitoryService dormitoryService)
         {
             _administratorService = administratorService;
+            _dormitoryService = dormitoryService;
         }
 
         
@@ -29,6 +33,28 @@ namespace _4Dorms.Controllers
                 return StatusCode(500, $"An error occurred while reviewing the dormitory: {ex.Message}");
             }
         }
+
+        [HttpPost("updateStatus")]
+        public async Task<IActionResult> UpdateDormStatus([FromBody] DormStatusUpdateDTO dto)
+        {
+            try
+            {
+                var success = await _administratorService.UpdateDormStatusAsync(dto.DormId, (DormitoryStatus)dto.Status);
+                if (success)
+                {
+                    return Ok("Dormitory status updated successfully.");
+                }
+                else
+                {
+                    return NotFound("Dormitory not found or update failed.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
 
         [HttpDelete("{UserId}")]
         public async Task<IActionResult> DeleteUserProfileByAdmin(int UserId, UserType userType)

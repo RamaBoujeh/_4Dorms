@@ -17,5 +17,6 @@ namespace _4Dorms.GenericRepo
         Task<Student> StudentGetByEmailAndPasswordAsync(string email, string password);
         Task<DormitoryOwner> DormOwnerGetByEmailAndPasswordAsync(string email, string password);
         Task<Administrator> AdminGetByEmailAndPasswordAsync(string email, string password);
+        Task<List<T>> GetListByConditionAsync(Expression<Func<T, bool>> predicate);
     }
 }

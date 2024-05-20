@@ -75,7 +75,7 @@ namespace _4Dorms.Repositories.implementation
 
         private async Task RemoveFavoriteListForUser(int favoriteListId, UserType userType)
         {
-            switch(userType)
+            switch (userType)
             {
                 case UserType.Student:
                     var studentFavoriteList = await _genericRepositoryFavoriteList.GetByIdAsync(favoriteListId);
@@ -97,8 +97,20 @@ namespace _4Dorms.Repositories.implementation
 
                 default:
                     break;
-                }
             }
+        }
+
+        public async Task<bool> UpdateDormStatusAsync(int dormId, DormitoryStatus status)
+        {
+            var dorm = await _genericRepositoryDorm.FindByConditionAsync(d => d.DormitoryId == dormId);
+            if (dorm == null)
+            {
+                return false;
+            }
+            dorm.Status = status;
+            _genericRepositoryDorm.Update(dorm);
+            return await _genericRepositoryDorm.SaveChangesAsync();
+        }
 
     }
 }

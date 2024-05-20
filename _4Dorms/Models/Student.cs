@@ -22,11 +22,14 @@ namespace _4Dorms.Models
         public DateTime DateOfBirth { get; set; }
         public string Disabilities { get; set; }
         public string ProfilePictureUrl { get; set; }
+        public virtual ICollection<Booking> Bookings { get; set; }
         public virtual ICollection<FavoriteList> Favorites { get; set; }
 
         public Student()
         {
             Favorites = new HashSet<FavoriteList>();
+            Bookings = new HashSet<Booking>();
         }
+       
     }
 }
