@@ -105,6 +105,7 @@ namespace _4Dorms.Repositories.implementation
             var dorm = await _genericRepositoryDorm.FindByConditionAsync(d => d.DormitoryId == dormId);
             if (dorm == null)
             {
+                Console.WriteLine($"Dormitory not found with DormId={dormId}");
                 return false;
             }
             dorm.Status = status;

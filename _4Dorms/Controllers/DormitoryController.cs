@@ -45,6 +45,21 @@ namespace _4Dorms.Controllers
             }
         }
 
+        [HttpGet("approved")]
+        public async Task<ActionResult<List<Dormitory>>> GetApprovedDormsAsync()
+        {
+            try
+            {
+                var approvedDorms = await _dormitoryService.GetDormsByStatusAsync(DormitoryStatus.Approved);
+                return Ok(approvedDorms);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
 
         [HttpGet("search")]
         public async Task<ActionResult<List<Dormitory>>> SearchDormitoriesAsync([FromQuery] string keywords, [FromQuery] string city, [FromQuery] string nearbyUniversity, [FromQuery] string genderType)

@@ -24,6 +24,7 @@ namespace _4Dorms.Resources
         [DataType(DataType.Currency)]
         public decimal PriceHalfYear { get; set; }
         [Required]
+
         [DataType(DataType.Currency)]
         public decimal PriceFullYear { get; set; }
         public DormitoryStatus Status { get; set; }

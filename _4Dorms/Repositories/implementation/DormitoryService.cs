@@ -57,8 +57,8 @@ namespace _4Dorms.Repositories.implementation
         public async Task<List<Dormitory>> GetDormsByStatusAsync(DormitoryStatus status)
         {
             return await _genericRepositoryDorm.GetListByConditionAsync(d => d.Status == status);
-                
         }
+
 
     }
 }

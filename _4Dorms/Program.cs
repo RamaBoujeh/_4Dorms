@@ -1,30 +1,28 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using _4Dorms.Persistance;
 using _4Dorms.Repositories.Interfaces;
 using _4Dorms.GenericRepo;
 using _4Dorms.Models;
-using _4Dorms.Repositories.implementation;
-using _4Dorms;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Microsoft.Extensions.Options;
 using _4Dorms.Repositories.Implementation;
+using _4Dorms.Repositories.implementation;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddControllers();
 
-// Access configuration
-var configuration = builder.Configuration;
+// Add services to the container.
+builder.Services.AddControllers();
 
 // Add CORS services and configure the policy to allow only the specified origin
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowedOriginsPolicy", builder =>
+    options.AddPolicy("AllowedOriginsPolicy", policyBuilder =>
     {
-        builder.WithOrigins("http://127.0.0.1:5500") // Replace with your frontend origin
-               .AllowAnyHeader()
-               .AllowAnyMethod();
+        policyBuilder.WithOrigins("http://127.0.0.1:5500") // Replace with your frontend origin
+                     .AllowAnyHeader()
+                     .AllowAnyMethod()
+                     .AllowCredentials();
     });
 });
 
@@ -71,6 +69,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAutoMapper(typeof(Program));
+
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.Limits.MaxRequestHeadersTotalSize = 32768; // Increase as necessary
+});
 
 var app = builder.Build();
 

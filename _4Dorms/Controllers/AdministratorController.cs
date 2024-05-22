@@ -39,6 +39,7 @@ namespace _4Dorms.Controllers
         {
             try
             {
+                Console.WriteLine($"Received request to update dorm status: DormId={dto.DormId}, Status={dto.Status}");
                 var success = await _administratorService.UpdateDormStatusAsync(dto.DormId, (DormitoryStatus)dto.Status);
                 if (success)
                 {
@@ -46,11 +47,13 @@ namespace _4Dorms.Controllers
                 }
                 else
                 {
+                    Console.WriteLine($"Dormitory not found or update failed for DormId={dto.DormId}");
                     return NotFound("Dormitory not found or update failed.");
                 }
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Error: {ex.Message}");
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
