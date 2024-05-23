@@ -16,20 +16,16 @@ namespace _4Dorms.Controllers
             _dormitoryService = dormitoryService;  
         }
 
-        [HttpPost("select")]
-        public async Task<IActionResult> SelectDormitory(int dormitoryId)
+        [HttpGet("dormitory/{id}")]
+        public async Task<IActionResult> GetDormitoryById(int id)
         {
-            bool success = await _dormitoryService.SelectDormitoryAsync(dormitoryId);
-
-            if (success)
+            var dormitory = await _dormitoryService.GetDormitoryByIdAsync(id);
+            if (dormitory == null)
             {
-                return Ok("Dormitory selected successfully.");
+                return NotFound("Dormitory not found.");
             }
-            else
-            {
-                return NotFound("Dormitory not found or selection failed.");
-            }
-        }
+            return Ok(dormitory);
+        }   
 
         [HttpGet("pending")]
         public async Task<ActionResult<List<Dormitory>>> GetPendingDormsAsync()

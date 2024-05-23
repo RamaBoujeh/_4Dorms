@@ -19,20 +19,9 @@ namespace _4Dorms.Repositories.implementation
             _genericRepositoryOwner = genericRepositoryOwner;
         }
 
-        public async Task<bool> SelectDormitoryAsync(int dormitoryId)
+        public async Task<Dormitory> GetDormitoryByIdAsync(int dormitoryId)
         {
-            try
-            {
-                var dormitory = await _genericRepositoryDorm.GetByIdAsync(dormitoryId);
-                if (dormitory == null)
-                    return false;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error selecting dormitory: {ex.Message}");
-                return false;
-            }
+            return await _genericRepositoryDorm.GetByIdAsync(dormitoryId);
         }
 
         public async Task<List<Dormitory>> SearchDormitoriesAsync(string keywords, string city, string nearbyUniversity, string genderType)
