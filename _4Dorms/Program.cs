@@ -64,6 +64,7 @@ builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IGenericRepository<Room>, GenericRepository<Room>>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IGenericRepository<Booking>, GenericRepository<Booking>>();
+builder.Services.AddLogging();  
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

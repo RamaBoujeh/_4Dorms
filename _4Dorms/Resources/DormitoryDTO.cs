@@ -1,44 +1,17 @@
-﻿using _4Dorms.Models;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Collections.Generic;
+﻿using _4Dorms.Resources;
 
-namespace _4Dorms.Resources
+public class DormitoryDTO
 {
-    public class DormitoryDTO
-    {
-        [Required]
-        [StringLength(150)]
-        public string DormitoryName { get; set; }
-        public string GenderType { get; set; }
-        public string City { get; set; }
-        public string NearbyUniversity { get; set; }
-        [Phone] 
-        public string Phone { get; set; }
-        [EmailAddress]
-        public string Email { get; set; }
-        public string DormitoryDescription { get; set; }
-        [Required]
-        public string Location { get; set; }
-        [Required]
-        [DataType(DataType.Currency)]
-        public decimal PriceHalfYear { get; set; }
-        [Required]
-
-        [DataType(DataType.Currency)]
-        public decimal PriceFullYear { get; set; }
-        public DormitoryStatus Status { get; set; }
-
-        [ForeignKey("DormitoryOwnerId")]
-        public int? DormitoryOwnerId { get; set; }
-        public ICollection<string> ImageUrls { get; set; }
-
-        // Add RoomDTO property
-        public RoomDTO RoomDTO { get; set; }
-
-        public DormitoryDTO()
-        {
-            ImageUrls = new List<string>();
-        }
-    }
+    public string DormitoryName { get; set; }
+    public string GenderType { get; set; }
+    public string City { get; set; }
+    public string Location { get; set; }
+    public string NearbyUniversity { get; set; }
+    public string Phone { get; set; }
+    public string Email { get; set; }
+    public string DormitoryDescription { get; set; }
+    public decimal PriceHalfYear { get; set; }
+    public decimal PriceFullYear { get; set; }
+    public List<string> ImageUrls { get; set; }
+    public RoomDTO RoomDTO { get; set; }
 }

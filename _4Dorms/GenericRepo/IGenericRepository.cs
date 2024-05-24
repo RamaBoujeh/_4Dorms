@@ -14,6 +14,7 @@ namespace _4Dorms.GenericRepo
         void Remove(int id);
         void Update(T entity);
         IQueryable<T> Query();
+        Task AddRange(IEnumerable<T> entities);
         Task<Student> StudentGetByEmailAndPasswordAsync(string email, string password);
         Task<DormitoryOwner> DormOwnerGetByEmailAndPasswordAsync(string email, string password);
         Task<Administrator> AdminGetByEmailAndPasswordAsync(string email, string password);

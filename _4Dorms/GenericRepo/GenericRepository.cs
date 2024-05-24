@@ -1,9 +1,7 @@
 ﻿using _4Dorms.Persistance;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using System.Linq;
 using _4Dorms.Models;
-
 
 namespace _4Dorms.GenericRepo
 {
@@ -46,6 +44,7 @@ namespace _4Dorms.GenericRepo
         {
             return await _entities.AnyAsync(predicate);
         }
+
         public async Task<bool> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync().ConfigureAwait(false) > 0;
@@ -60,10 +59,24 @@ namespace _4Dorms.GenericRepo
         {
             _entities.Update(entity);
         }
+
         public IQueryable<T> Query()
         {
             return _entities.AsQueryable();
         }
+
+        // AddRange method to add multiple entities of any type
+        public async Task AddRange(IEnumerable<T> entities)
+        {
+            await _entities.AddRangeAsync(entities);
+        }
+
+        // Specific method for adding DormitoryImage entities
+        public async Task AddDormitoryImagesRange(IEnumerable<DormitoryImage> dormitoryImages)
+        {
+            await _context.DormitoryImages.AddRangeAsync(dormitoryImages);
+        }
+
         public async Task<IEnumerable<T>> SearchDormitories(Expression<Func<T, bool>> predicate)
         {
             return await _entities.Where(predicate).ToListAsync();
@@ -88,6 +101,5 @@ namespace _4Dorms.GenericRepo
         {
             return await _entities.Where(predicate).ToListAsync();
         }
-
     }
 }
