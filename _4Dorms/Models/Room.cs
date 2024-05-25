@@ -5,10 +5,11 @@ namespace _4Dorms.Models
 {
     public class Room
     {
+        [Key]
         public int RoomID { get; set; }
-        public bool? privateRoom { get; set; }
+        public bool? PrivateRoom { get; set; }
         public bool? SharedRoom { get; set; }
-        public int? NumOfprivateRooms { get; set; }
+        public int? NumOfPrivateRooms { get; set; }
         public int? NumOfSharedRooms { get; set; }
 
         [ForeignKey("DormitoryId")]

@@ -235,22 +235,22 @@ namespace _4Dorms.Controllers
 
 
         [HttpDelete("{userId}/{userType}")]
-            public async Task<IActionResult> DeleteUser(int userId, UserType userType)
+        public async Task<IActionResult> DeleteUser(int userId, UserType userType)
+        {
+            var result = await _userService.DeleteUserProfileAsync(userId, userType);
+
+            if (result)
             {
-                var result = await _userService.DeleteUserProfileAsync(userId, userType);
-
-                if (result)
-                {
-                    return Ok();
-                }
-                else
-                {
-                    return NotFound();
-                }
+                return Ok();
             }
-
+            else
+            {
+                return NotFound();
+            }
         }
+
     }
+} 
 
     
 

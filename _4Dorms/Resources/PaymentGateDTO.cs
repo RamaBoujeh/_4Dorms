@@ -5,8 +5,8 @@ namespace _4Dorms.Resources
     public class PaymentGateDTO
     {
         [Required]
-        [CreditCard]
-        public int CardNumber { get; set; }
+        [CustomCardNumber]  // Apply custom validation attribute
+        public string CardNumber { get; set; }
 
         [Required]
         public DateTime ExpirationDate { get; set; }

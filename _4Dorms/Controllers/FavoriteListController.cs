@@ -1,7 +1,8 @@
 ﻿using _4Dorms.Repositories.Interfaces;
 using _4Dorms.Resources;
+using _4Dorms.Repositories.implementation;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 
 namespace _4Dorms.Controllers
 {
@@ -23,57 +24,98 @@ namespace _4Dorms.Controllers
         {
             if (!ModelState.IsValid)
             {
-                _logger.LogWarning("Invalid model state: {ModelState}", ModelState);
+                _logger.LogWarning("Model state is invalid");
                 return BadRequest(ModelState);
             }
 
-            try
+            // Get the user ID from the token
+            var userIdClaim = User.FindFirst("StudentId") ?? User.FindFirst("DormitoryOwnerId");
+            if (userIdClaim == null)
             {
-                _logger.LogInformation("Adding dormitory to favorites. FavoriteListId: {FavoriteListId}, DormitoryId: {DormitoryId}", favoriteData.FavoriteListId, favoriteData.DormitoryId);
-
-                var result = await _favoriteListService.AddDormitoryToFavoritesAsync(favoriteData.FavoriteListId, favoriteData.DormitoryId);
-
-                if (result)
-                {
-                    _logger.LogInformation("Dormitory added to favorites successfully.");
-                    return Ok("Dormitory added to favorites successfully.");
-                }
-                else
-                {
-                    _logger.LogError("Failed to add dormitory to favorites.");
-                    return StatusCode(500, "Failed to add dormitory to favorites.");
-                }
+                _logger.LogWarning("User ID claim not found in token");
+                return Unauthorized("User ID claim not found in token");
             }
-            catch (Exception ex)
+            var userId = int.Parse(userIdClaim.Value);
+            _logger.LogInformation("User ID from token: {UserId}", userId);
+
+            // Get the user type from the token
+            var userTypeClaim = User.FindFirst(ClaimTypes.Role);
+            if (userTypeClaim == null)
             {
-                _logger.LogError(ex, "Exception occurred while adding dormitory to favorites.");
-                return StatusCode(500, "An error occurred while adding dormitory to favorites.");
+                _logger.LogWarning("User role claim not found in token");
+                return Unauthorized("User role claim not found in token");
             }
+            var userType = userTypeClaim.Value;
+            _logger.LogInformation("User type from token: {UserType}", userType);
+
+            // Fetch the favorite list ID based on user ID and user type
+            var favoriteListId = await _favoriteListService.GetFavoriteListIdAsync(userId, userType);
+
+            if (favoriteListId == null)
+            {
+                _logger.LogError("Failed to retrieve favorite list ID for user ID {UserId} and type {UserType}", userId, userType);
+                return StatusCode(500, "Failed to retrieve favorite list ID");
+            }
+
+            _logger.LogInformation("Favorite list ID: {FavoriteListId}", favoriteListId);
+
+            var result = await _favoriteListService.AddDormitoryToFavoritesAsync(favoriteListId.Value, favoriteData.DormitoryId);
+
+            if (result)
+            {
+                _logger.LogInformation("Dormitory ID {DormitoryId} added to favorite list ID {FavoriteListId}", favoriteData.DormitoryId, favoriteListId.Value);
+                return Ok("Dormitory added to favorites successfully.");
+            }
+            else
+            {
+                _logger.LogError("Failed to add dormitory ID {DormitoryId} to favorite list ID {FavoriteListId}", favoriteData.DormitoryId, favoriteListId.Value);
+                return StatusCode(500, "Failed to add dormitory to favorites.");
+            }
+        }
+
+        [HttpGet("user-favorites")]
+        public async Task<IActionResult> GetUserFavorites()
+        {
+            var userIdClaim = User.FindFirst("StudentId") ?? User.FindFirst("DormitoryOwnerId");
+            if (userIdClaim == null)
+            {
+                return Unauthorized("User ID claim not found in token");
+            }
+            var userId = int.Parse(userIdClaim.Value);
+
+            var userTypeClaim = User.FindFirst(ClaimTypes.Role);
+            if (userTypeClaim == null)
+            {
+                return Unauthorized("User role claim not found in token");
+            }
+            var userType = userTypeClaim.Value;
+
+            var favoriteListId = await _favoriteListService.GetFavoriteListIdAsync(userId, userType);
+            if (favoriteListId == null)
+            {
+                return StatusCode(500, "Failed to retrieve favorite list ID");
+            }
+
+            var favoriteList = await _favoriteListService.GetFavoriteListByIdAsync(favoriteListId.Value);
+            if (favoriteList == null || !favoriteList.Dormitories.Any())
+            {
+                return NotFound("No favorite dormitories found");
+            }
+
+            return Ok(favoriteList.Dormitories);
         }
 
         [HttpDelete("{favoriteListId}/remove")]
         public async Task<IActionResult> RemoveDormitoryFromFavorites(int favoriteListId, [FromBody] int dormitoryId)
         {
-            try
+            var result = await _favoriteListService.RemoveDormitoryFromFavoritesAsync(favoriteListId, dormitoryId);
+
+            if (result)
             {
-                _logger.LogInformation("Removing dormitory from favorites. FavoriteListId: {FavoriteListId}, DormitoryId: {DormitoryId}", favoriteListId, dormitoryId);
-
-                var result = await _favoriteListService.RemoveDormitoryFromFavoritesAsync(favoriteListId, dormitoryId);
-
-                if (result)
-                {
-                    _logger.LogInformation("Dormitory removed from favorites successfully.");
-                    return Ok(new { Message = "Dormitory removed from favorites successfully." });
-                }
-
-                _logger.LogWarning("Failed to remove dormitory from favorites.");
-                return BadRequest(new { Message = "Failed to remove dormitory from favorites." });
+                return Ok(new { Message = "Dormitory removed from favorites successfully." });
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Exception occurred while removing dormitory from favorites.");
-                return StatusCode(500, "An error occurred while removing dormitory from favorites.");
-            }
+
+            return BadRequest(new { Message = "Failed to remove dormitory from favorites." });
         }
     }
 }

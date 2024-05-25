@@ -1,15 +1,22 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using _4Dorms.Models;
+using _4Dorms.Resources;
+using System.ComponentModel.DataAnnotations;
 
-namespace _4Dorms.Resources
+public class BookingDTO
 {
-    public class BookingDTO
-    {
-        public int RoomId { get; set; }
-        public int DormitoryId { get; set; }
-        [DataType(DataType.Date)]
-        public DateTime CheckInDate { get; set; }
-        [DataType(DataType.Date)]
-        public DateTime CheckOutDate { get; set; }
+    [Required]
+    public int RoomId { get; set; }
 
-    }
+    [Required]
+    public int DormitoryId { get; set; }
+
+    [Required]
+    public int StudentId { get; set; }
+
+    [Required]
+    public Duration Duration { get; set; }
+
+    [Required]
+    public RoomType RoomType { get; set; }
+
 }

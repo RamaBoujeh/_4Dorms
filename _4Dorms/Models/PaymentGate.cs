@@ -7,7 +7,7 @@ namespace _4Dorms.Models
         [Key]
         public int PaymentGateId { get; set; }
         [CreditCard]
-        public int CardNumber { get; set; }
+        public string CardNumber { get; set; }  // Changed to string to handle credit card numbers correctly
         public DateTime PaymentDate { get; set; }
         public DateTime ExpirationDate { get; set; }
         public int CVV { get; set; }

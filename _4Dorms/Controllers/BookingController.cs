@@ -1,6 +1,8 @@
 ﻿using _4Dorms.Repositories.Interfaces;
 using _4Dorms.Resources;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace _4Dorms.Controllers
 {
@@ -16,35 +18,28 @@ namespace _4Dorms.Controllers
         }
 
         [HttpPost("request")]
-        public async Task<IActionResult> RequestBooking(BookingDTO bookingDTO)
+        public async Task<IActionResult> RequestBooking([FromBody] BookingDTO bookingDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var result = await _bookingService.RequestBookingAsync(bookingDTO);
-            if (result)
+            try
             {
-                return Ok("Booking request submitted successfully.");
+                var result = await _bookingService.BookingAsync(bookingDTO);
+                if (result)
+                {
+                    return Ok(new { bookingId = bookingDTO.RoomId }); // Return booking ID
+                }
+                else
+                {
+                    return StatusCode(500, "Failed to submit booking request.");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return StatusCode(500, "Failed to submit booking request.");
-            }
-        }
-
-        [HttpPost("confirm/{bookingId}")]
-        public async Task<IActionResult> ConfirmBooking(int bookingId, bool isApproved, int dormitoryOwnerId)
-        {
-            var result = await _bookingService.ConfirmBookingAsync(bookingId, isApproved, dormitoryOwnerId);
-            if (result)
-            {
-                return Ok(isApproved ? "Booking confirmed." : "Booking rejected.");
-            }
-            else
-            {
-                return StatusCode(500, "Failed to confirm booking.");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
     }

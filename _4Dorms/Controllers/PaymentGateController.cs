@@ -1,6 +1,7 @@
 ﻿using _4Dorms.Repositories.Interfaces;
 using _4Dorms.Resources;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace _4Dorms.Controllers
 {
@@ -16,14 +17,19 @@ namespace _4Dorms.Controllers
         }
 
         [HttpPost("process")]
-        public async Task<IActionResult> ProcessPayment(PaymentGateDTO paymentDto)
+        public async Task<IActionResult> ProcessPayment([FromBody] PaymentGateDTO paymentDto) // Add [FromBody]
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var result = await _paymentService.ProcessPaymentAsync(paymentDto);
             if (result)
             {
-                return Ok(new { Message = "Payment processed successfully." });
+                return Ok(new { success = true, message = "Payment processed successfully." });
             }
-            return BadRequest(new { Message = "Payment processing failed. Please check your payment information." });
+            return BadRequest(new { success = false, message = "Payment processing failed. Please check your payment information." });
         }
     }
 }

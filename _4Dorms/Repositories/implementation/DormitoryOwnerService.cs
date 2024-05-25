@@ -64,9 +64,9 @@ namespace _4Dorms.Repositories.Implementation
             {
                 var room = new Room
                 {
-                    privateRoom = dormitoryDTO.RoomDTO.PrivateRoom,
+                    PrivateRoom = dormitoryDTO.RoomDTO.PrivateRoom,
                     SharedRoom = dormitoryDTO.RoomDTO.SharedRoom,
-                    NumOfprivateRooms = dormitoryDTO.RoomDTO.NumOfPrivateRooms,
+                    NumOfPrivateRooms = dormitoryDTO.RoomDTO.NumOfPrivateRooms,
                     NumOfSharedRooms = dormitoryDTO.RoomDTO.NumOfSharedRooms,
                     DormitoryId = dormitory.DormitoryId
                 };

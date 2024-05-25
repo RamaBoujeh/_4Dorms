@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using _4Dorms.Persistance;
 
@@ -11,9 +12,11 @@ using _4Dorms.Persistance;
 namespace _4Dorms.Migrations
 {
     [DbContext(typeof(_4DormsDbContext))]
-    partial class _4DormsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240525171614_joinTable")]
+    partial class joinTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,19 +25,27 @@ namespace _4Dorms.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("DormitoryFavoriteList", b =>
+            modelBuilder.Entity("FavoriteList", b =>
                 {
-                    b.Property<int>("DormitoriesDormitoryId")
+                    b.Property<int>("FavoriteId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("FavoritesFavoriteId")
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FavoriteId"));
+
+                    b.Property<int?>("DormitoryOwnerId")
                         .HasColumnType("int");
 
-                    b.HasKey("DormitoriesDormitoryId", "FavoritesFavoriteId");
+                    b.Property<int?>("StudentId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("FavoritesFavoriteId");
+                    b.HasKey("FavoriteId");
 
-                    b.ToTable("DormitoryFavoriteList", (string)null);
+                    b.HasIndex("DormitoryOwnerId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("FavoriteLists");
                 });
 
             modelBuilder.Entity("_4Dorms.Models.Administrator", b =>
@@ -155,6 +166,9 @@ namespace _4Dorms.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("FavoriteListFavoriteId")
+                        .HasColumnType("int");
+
                     b.Property<string>("GenderType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -167,6 +181,10 @@ namespace _4Dorms.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("PriceFullYear")
                         .HasColumnType("decimal(18,2)");
 
@@ -176,17 +194,30 @@ namespace _4Dorms.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<string>("phone")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("DormitoryId");
 
                     b.HasIndex("AdministratorId");
 
                     b.HasIndex("DormitoryOwnerId");
 
+                    b.HasIndex("FavoriteListFavoriteId");
+
                     b.ToTable("Dormitories");
+                });
+
+            modelBuilder.Entity("_4Dorms.Models.DormitoryFavoriteList", b =>
+                {
+                    b.Property<int>("DormitoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FavoriteId")
+                        .HasColumnType("int");
+
+                    b.HasKey("DormitoryId", "FavoriteId");
+
+                    b.HasIndex("FavoriteId");
+
+                    b.ToTable("DormitoryFavoriteLists");
                 });
 
             modelBuilder.Entity("_4Dorms.Models.DormitoryImage", b =>
@@ -248,29 +279,6 @@ namespace _4Dorms.Migrations
                     b.HasKey("DormitoryOwnerId");
 
                     b.ToTable("DormitoryOwners");
-                });
-
-            modelBuilder.Entity("_4Dorms.Models.FavoriteList", b =>
-                {
-                    b.Property<int>("FavoriteId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FavoriteId"));
-
-                    b.Property<int?>("DormitoryOwnerId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("StudentId")
-                        .HasColumnType("int");
-
-                    b.HasKey("FavoriteId");
-
-                    b.HasIndex("DormitoryOwnerId");
-
-                    b.HasIndex("StudentId");
-
-                    b.ToTable("FavoriteLists");
                 });
 
             modelBuilder.Entity("_4Dorms.Models.LogIn", b =>
@@ -430,19 +438,19 @@ namespace _4Dorms.Migrations
                     b.ToTable("Students");
                 });
 
-            modelBuilder.Entity("DormitoryFavoriteList", b =>
+            modelBuilder.Entity("FavoriteList", b =>
                 {
-                    b.HasOne("_4Dorms.Models.Dormitory", null)
-                        .WithMany()
-                        .HasForeignKey("DormitoriesDormitoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("_4Dorms.Models.DormitoryOwner", "DormitoryOwner")
+                        .WithMany("Favorites")
+                        .HasForeignKey("DormitoryOwnerId");
 
-                    b.HasOne("_4Dorms.Models.FavoriteList", null)
-                        .WithMany()
-                        .HasForeignKey("FavoritesFavoriteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("_4Dorms.Models.Student", "Student")
+                        .WithMany("Favorites")
+                        .HasForeignKey("StudentId");
+
+                    b.Navigation("DormitoryOwner");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("_4Dorms.Models.Booking", b =>
@@ -490,9 +498,32 @@ namespace _4Dorms.Migrations
                         .WithMany("Dormitories")
                         .HasForeignKey("DormitoryOwnerId");
 
+                    b.HasOne("FavoriteList", null)
+                        .WithMany("Dormitories")
+                        .HasForeignKey("FavoriteListFavoriteId");
+
                     b.Navigation("Administrator");
 
                     b.Navigation("DormitoryOwner");
+                });
+
+            modelBuilder.Entity("_4Dorms.Models.DormitoryFavoriteList", b =>
+                {
+                    b.HasOne("_4Dorms.Models.Dormitory", "Dormitory")
+                        .WithMany("DormitoryFavoriteLists")
+                        .HasForeignKey("DormitoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FavoriteList", "FavoriteList")
+                        .WithMany("DormitoryFavoriteLists")
+                        .HasForeignKey("FavoriteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dormitory");
+
+                    b.Navigation("FavoriteList");
                 });
 
             modelBuilder.Entity("_4Dorms.Models.DormitoryImage", b =>
@@ -504,21 +535,6 @@ namespace _4Dorms.Migrations
                         .IsRequired();
 
                     b.Navigation("Dormitory");
-                });
-
-            modelBuilder.Entity("_4Dorms.Models.FavoriteList", b =>
-                {
-                    b.HasOne("_4Dorms.Models.DormitoryOwner", "DormitoryOwner")
-                        .WithMany("Favorites")
-                        .HasForeignKey("DormitoryOwnerId");
-
-                    b.HasOne("_4Dorms.Models.Student", "Student")
-                        .WithMany("Favorites")
-                        .HasForeignKey("StudentId");
-
-                    b.Navigation("DormitoryOwner");
-
-                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("_4Dorms.Models.Review", b =>
@@ -545,9 +561,18 @@ namespace _4Dorms.Migrations
                     b.Navigation("Dormitory");
                 });
 
+            modelBuilder.Entity("FavoriteList", b =>
+                {
+                    b.Navigation("Dormitories");
+
+                    b.Navigation("DormitoryFavoriteLists");
+                });
+
             modelBuilder.Entity("_4Dorms.Models.Dormitory", b =>
                 {
                     b.Navigation("Bookings");
+
+                    b.Navigation("DormitoryFavoriteLists");
 
                     b.Navigation("ImageUrls");
 

@@ -59,12 +59,20 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped<IDormitoryOwnerService, DormitoryOwnerService>();
 builder.Services.AddScoped<IAdministratorService, AdministratorService>();
 builder.Services.AddScoped<IFavoriteListService, FavoriteListService>();
+builder.Services.AddScoped<IGenericRepository<FavoriteList>, GenericRepository<FavoriteList>>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IGenericRepository<Room>, GenericRepository<Room>>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IGenericRepository<Booking>, GenericRepository<Booking>>();
-builder.Services.AddLogging();  
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddLogging(logging =>
+{
+    logging.ClearProviders();
+    logging.AddConsole();
+    logging.AddDebug();
+    // Add other logging providers if needed
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

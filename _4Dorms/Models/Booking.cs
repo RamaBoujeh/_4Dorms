@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace _4Dorms.Models
 {
@@ -9,6 +9,20 @@ namespace _4Dorms.Models
         Approved,
         Rejected
     }
+
+    public enum Duration
+    {
+        SixMonths = 0,
+        TwelveMonths = 1
+    }
+
+
+    public enum RoomType
+    {
+        Private = 0,
+        Shared = 1
+    }
+
     public class Booking
     {
         [Key]
@@ -22,10 +36,8 @@ namespace _4Dorms.Models
         [ForeignKey("DormitoryId")]
         public int? DormitoryId { get; set; }
         public Dormitory Dormitory { get; set; }
-        public DateTime CheckOutDate { get; set; }
-        public DateTime CheckInDate { get; set; }
-        public Status Status { get; set; }
-        [ForeignKey("DormitoryOwnerId")]
+        public Duration Duration { get; set; }
+        public RoomType RoomType { get; set; }
         public int? DormitoryOwnerId { get; set; }
         public DormitoryOwner DormitoryOwner { get; set; }
 

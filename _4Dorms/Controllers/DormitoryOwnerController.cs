@@ -45,12 +45,6 @@ namespace _4Dorms.Controllers
 
             return Ok("Dormitory submitted for approval successfully");
         }
-
-
-
-
-
-
         [Authorize(Roles = "DormitoryOwner")]
         [HttpPut("update-dormitory/{dormitoryId}")]
         public async Task<IActionResult> UpdateDormitory(int dormitoryId, [FromBody] DormitoryDTO updatedDormitoryDTO)

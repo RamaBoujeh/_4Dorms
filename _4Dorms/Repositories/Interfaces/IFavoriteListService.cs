@@ -1,8 +1,12 @@
-﻿namespace _4Dorms.Repositories.Interfaces
+﻿using _4Dorms.Models;
+
+namespace _4Dorms.Repositories.Interfaces
 {
     public interface IFavoriteListService
     {
         Task<bool> AddDormitoryToFavoritesAsync(int favoriteListId, int dormitoryId);
         Task<bool> RemoveDormitoryFromFavoritesAsync(int favoriteListId, int dormitoryId);
+        Task<int?> GetFavoriteListIdAsync(int userId, string userType);
+        Task<FavoriteList> GetFavoriteListByIdAsync(int favoriteListId);
     }
 }

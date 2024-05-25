@@ -14,15 +14,25 @@ namespace _4Dorms.Repositories.implementation
         private readonly IGenericRepository<DormitoryOwner> _dormitoryOwnerRepository;
         private readonly IGenericRepository<Administrator> _administratorRepository;
         private readonly IGenericRepository<FavoriteList> _favoriteListRepository;
+        private readonly IGenericRepository<Dormitory> _dormitoryRepository;
+        private readonly IGenericRepository<Room> _roomRepository;
+        private readonly IGenericRepository<DormitoryImage> _dormitoryImageRepository;
+        private readonly IGenericRepository<Review> _reviewRepository;
 
         public UserService(IGenericRepository<Student> studentRepository, IGenericRepository<DormitoryOwner> dormitoryOwnerRepository,
-            IGenericRepository<Administrator> administratorRepository, IGenericRepository<FavoriteList> favoriteListRepository, IHttpContextAccessor httpContextAccessor)
+            IGenericRepository<Administrator> administratorRepository, IGenericRepository<FavoriteList> favoriteListRepository,
+            IHttpContextAccessor httpContextAccessor, IGenericRepository<Dormitory> dormitoryRepository, IGenericRepository<Room> roomRepository,
+            IGenericRepository<DormitoryImage> dormitoryImageRepository, IGenericRepository<Review> reviewRepository)
         {
             _administratorRepository = administratorRepository;
             _studentRepository = studentRepository;
             _dormitoryOwnerRepository = dormitoryOwnerRepository;
             _favoriteListRepository = favoriteListRepository;
             _httpContextAccessor = httpContextAccessor;
+            _dormitoryRepository = dormitoryRepository;
+            _roomRepository = roomRepository;
+            _dormitoryImageRepository = dormitoryImageRepository;
+            _reviewRepository = reviewRepository;
         }
 
         public async Task<bool> SignUpAsync(SignUpDTO signUpData)
@@ -273,6 +283,8 @@ namespace _4Dorms.Repositories.implementation
                     if (dormitoryOwner == null)
                         return false;
 
+                    await RemoveDormitoriesForOwner(userId);
+
                     await RemoveFavoriteListsForUser(userId, UserType.DormitoryOwner);
 
                     _dormitoryOwnerRepository.Remove(userId);
@@ -291,40 +303,74 @@ namespace _4Dorms.Repositories.implementation
             }
         }
 
-        private async Task RemoveFavoriteListsForUser(int userId, UserType userType)
+        private async Task RemoveDormitoriesForOwner(int ownerId)
         {
-            ICollection<FavoriteList> favoriteLists = null;
+            var dormitories = _dormitoryRepository.Query().Where(d => d.DormitoryOwnerId == ownerId).ToList();
 
-            switch (userType)
+            foreach (var dormitory in dormitories)
             {
-                case UserType.Student:
-                    var student = await _studentRepository.GetByIdAsync(userId);
-                    if (student != null)
-                    {
-                        favoriteLists = student.Favorites;
-                    }
-                    break;
-
-                case UserType.DormitoryOwner:
-                    var dormitoryOwner = await _dormitoryOwnerRepository.GetByIdAsync(userId);
-                    if (dormitoryOwner != null)
-                    {
-                        favoriteLists = dormitoryOwner.Favorites;
-                    }
-                    break;
+                await RemoveDormitoryRelatedEntities(dormitory.DormitoryId);
+                _dormitoryRepository.Remove(dormitory.DormitoryId);
             }
 
-            if (favoriteLists != null)
+            await _dormitoryRepository.SaveChangesAsync();
+        }
+
+        private async Task RemoveDormitoryRelatedEntities(int dormitoryId)
+        {
+            // Remove Rooms
+            var rooms = _roomRepository.Query().Where(r => r.DormitoryId == dormitoryId).ToList();
+            foreach (var room in rooms)
             {
-                foreach (var favoriteList in favoriteLists)
+                _roomRepository.Remove(room.RoomID);
+            }
+
+            // Remove DormitoryImages
+            var images = _dormitoryImageRepository.Query().Where(img => img.DormitoryId == dormitoryId).ToList();
+            foreach (var image in images)
+            {
+                _dormitoryImageRepository.Remove(image.ImageId);
+            }
+
+            // Remove Reviews
+            var reviews = _reviewRepository.Query().Where(rv => rv.DormitoryId == dormitoryId).ToList();
+            foreach (var review in reviews)
+            {
+                _reviewRepository.Remove(review.ReviewId);
+            }
+
+            // Remove from FavoriteLists
+            var favoriteLists = _favoriteListRepository.Query().Where(fl => fl.Dormitories.Any(d => d.DormitoryId == dormitoryId)).ToList();
+            foreach (var favoriteList in favoriteLists)
+            {
+                var dormitory = favoriteList.Dormitories.FirstOrDefault(d => d.DormitoryId == dormitoryId);
+                if (dormitory != null)
                 {
-                    _favoriteListRepository.Remove(favoriteList.FavoriteId);
+                    favoriteList.Dormitories.Remove(dormitory);
+                    _favoriteListRepository.Update(favoriteList);
                 }
-                await _favoriteListRepository.SaveChangesAsync();
             }
+
+            await _roomRepository.SaveChangesAsync();
+            await _dormitoryImageRepository.SaveChangesAsync();
+            await _reviewRepository.SaveChangesAsync();
+            await _favoriteListRepository.SaveChangesAsync();
         }
 
 
+        private async Task RemoveFavoriteListsForUser(int userId, UserType userType)
+        {
+            var favoriteLists = _favoriteListRepository.Query().Where(fl =>
+                (userType == UserType.Student && fl.StudentId == userId) ||
+                (userType == UserType.DormitoryOwner && fl.DormitoryOwnerId == userId)).ToList();
+
+            foreach (var favoriteList in favoriteLists)
+            {
+                _favoriteListRepository.Remove(favoriteList.FavoriteId);
+            }
+
+            await _favoriteListRepository.SaveChangesAsync();
+        }
         //-------------------------------------------------------------------------------------
         public async Task<UserDTO> GetProfileAsync(int userId)
         {

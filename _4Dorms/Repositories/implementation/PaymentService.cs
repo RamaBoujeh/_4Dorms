@@ -7,34 +7,41 @@ namespace _4Dorms.Repositories.implementation
 {
     public class PaymentService : IPaymentService
     {
-        private readonly GenericRepository<PaymentGate> _paymentGateRepository;
+        private readonly IGenericRepository<PaymentGate> _paymentGateRepository;
+        private readonly IGenericRepository<Booking> _bookingRepository;
 
-        public PaymentService(GenericRepository<PaymentGate> paymentGateRepository)
+        public PaymentService(IGenericRepository<PaymentGate> paymentGateRepository, IGenericRepository<Booking> bookingRepository)
         {
             _paymentGateRepository = paymentGateRepository;
+            _bookingRepository = bookingRepository;
         }
 
-        public Task<bool> ProcessPaymentAsync(PaymentGateDTO paymentDto)
+        public async Task<bool> ProcessPaymentAsync(PaymentGateDTO paymentDto)
         {
-            // Emulated payment processing logic
             if (IsValidPaymentData(paymentDto))
             {
-                // Simulate a successful payment process
-                return Task.FromResult(true);
-            }
-            return Task.FromResult(false);
-        }
+                var payment = new PaymentGate
+                {
+                    CardNumber = paymentDto.CardNumber,
+                    ExpirationDate = paymentDto.ExpirationDate,
+                    CVV = paymentDto.CVV,
+                    Amount = paymentDto.Amount,
+                    PaymentDate = DateTime.Now
+                };
 
-        private bool IsValidPaymentData(PaymentGateDTO paymentDto)
-        {
-            // Add validation logic here
-            if (paymentDto.ExpirationDate > DateTime.Now && paymentDto.CVV.ToString().Length == 3)
-            {
-                // Assume valid if expiration date is in the future and CVV is 3 digits
-                return true;
+                _paymentGateRepository.Add(payment);
+                return await _paymentGateRepository.SaveChangesAsync();
             }
             return false;
         }
 
+        private bool IsValidPaymentData(PaymentGateDTO paymentDto)
+        {
+            if (paymentDto.ExpirationDate > DateTime.Now && paymentDto.CVV.ToString().Length == 3)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }
