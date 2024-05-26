@@ -1,69 +1,63 @@
-﻿using _4Dorms.Repositories.Interfaces;
-using _4Dorms.Resources;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using _4Dorms.Models;
+using _4Dorms.GenericRepo;
 using System.Threading.Tasks;
 
 namespace _4Dorms.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class RoomController : ControllerBase
     {
-        private readonly IRoomService _roomService;
+        private readonly IGenericRepository<Room> _roomRepository;
 
-        public RoomController(IRoomService roomService)
+        public RoomController(IGenericRepository<Room> roomRepository)
         {
-            _roomService = roomService;
-        }
-
-        [HttpPost("add")]
-        public async Task<IActionResult> AddRoom(RoomDTO room)
-        {
-            try
-            {
-                await _roomService.AddRoomAsync(room);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            _roomRepository = roomRepository;
         }
 
         [HttpGet("{dormitoryId}")]
         public async Task<IActionResult> GetRoomDetails(int dormitoryId)
         {
-            try
+            var room = await _roomRepository.FindByConditionAsync(r => r.DormitoryId == dormitoryId);
+            if (room == null)
             {
-                var roomDetails = await _roomService.GetRoomDetailsByDormitoryIdAsync(dormitoryId);
-                if (roomDetails == null)
-                {
-                    return NotFound();
-                }
-                return Ok(roomDetails);
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            return Ok(room);
         }
 
         [HttpPost("{dormitoryId}/decrement")]
-        public async Task<IActionResult> DecrementRoomAvailability(int dormitoryId, bool isPrivate)
+        public async Task<IActionResult> DecrementRoomCount(int dormitoryId, [FromBody] DecrementRoomDTO decrementRoomDTO)
         {
-            try
+            var room = await _roomRepository.FindByConditionAsync(r => r.DormitoryId == dormitoryId);
+            if (room == null)
             {
-                var success = await _roomService.DecrementRoomAvailabilityAsync(dormitoryId, isPrivate);
-                if (success)
-                {
-                    return Ok(new { success = true, message = "Room availability updated." });
-                }
-                return BadRequest(new { success = false, message = "Failed to update room availability." });
+                return NotFound();
             }
-            catch (Exception ex)
+
+            if (decrementRoomDTO.IsPrivate && room.NumOfPrivateRooms > 0)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                room.NumOfPrivateRooms--;
             }
+            else if (!decrementRoomDTO.IsPrivate && room.NumOfSharedRooms > 0)
+            {
+                room.NumOfSharedRooms--;
+            }
+            else
+            {
+                return BadRequest("No rooms available to decrement.");
+            }
+
+            _roomRepository.Update(room);
+            await _roomRepository.SaveChangesAsync();
+
+            return Ok(new { success = true, room });
         }
+    }
+
+    public class DecrementRoomDTO
+    {
+        public bool IsPrivate { get; set; }
     }
 }

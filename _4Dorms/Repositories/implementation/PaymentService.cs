@@ -2,6 +2,8 @@
 using _4Dorms.Models;
 using _4Dorms.Repositories.Interfaces;
 using _4Dorms.Resources;
+using System;
+using System.Threading.Tasks;
 
 namespace _4Dorms.Repositories.implementation
 {

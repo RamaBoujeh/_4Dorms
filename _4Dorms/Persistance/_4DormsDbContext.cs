@@ -38,6 +38,20 @@ namespace _4Dorms.Persistance
             .HasMany(fl => fl.Dormitories)
             .WithMany(d => d.Favorites)
             .UsingEntity(j => j.ToTable("DormitoryFavoriteList"));
+
+            modelBuilder.Entity<Dormitory>()
+                .Property(d => d.PriceFullYear)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Dormitory>()
+                .Property(d => d.PriceHalfYear)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<PaymentGate>()
+                .Property(p => p.Amount)
+                .HasColumnType("decimal(18,2)");
+
+            base.OnModelCreating(modelBuilder);
         }
 
     }

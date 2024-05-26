@@ -8,5 +8,6 @@ namespace _4Dorms.Repositories.Interfaces
         Task<Dormitory> GetDormitoryByIdAsync(int dormitoryId);
         Task<List<Dormitory>> SearchDormitoriesAsync(string keywords, string city, string nearbyUniversity, string genderType);
         Task<List<Dormitory>> GetDormsByStatusAsync(DormitoryStatus status);
+        Task<Dormitory> GetDormitoryDetailsAsync(int dormitoryId);
     }
 }

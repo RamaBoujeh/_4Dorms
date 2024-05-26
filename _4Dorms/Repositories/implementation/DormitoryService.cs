@@ -48,6 +48,11 @@ namespace _4Dorms.Repositories.implementation
             return await _genericRepositoryDorm.GetListByConditionAsync(d => d.Status == status);
         }
 
+        public async Task<Dormitory> GetDormitoryDetailsAsync(int dormitoryId)
+        {
+            var dorm = await _genericRepositoryDorm.GetByIdAsync(dormitoryId);
+            return dorm;
+        }
 
     }
 }

@@ -28,7 +28,6 @@ namespace _4Dorms.Controllers
                 return BadRequest(ModelState);
             }
 
-            // Get the user ID from the token
             var userIdClaim = User.FindFirst("StudentId") ?? User.FindFirst("DormitoryOwnerId");
             if (userIdClaim == null)
             {
@@ -38,7 +37,6 @@ namespace _4Dorms.Controllers
             var userId = int.Parse(userIdClaim.Value);
             _logger.LogInformation("User ID from token: {UserId}", userId);
 
-            // Get the user type from the token
             var userTypeClaim = User.FindFirst(ClaimTypes.Role);
             if (userTypeClaim == null)
             {
@@ -48,7 +46,6 @@ namespace _4Dorms.Controllers
             var userType = userTypeClaim.Value;
             _logger.LogInformation("User type from token: {UserType}", userType);
 
-            // Fetch the favorite list ID based on user ID and user type
             var favoriteListId = await _favoriteListService.GetFavoriteListIdAsync(userId, userType);
 
             if (favoriteListId == null)
@@ -76,21 +73,43 @@ namespace _4Dorms.Controllers
         [HttpGet("user-favorites")]
         public async Task<IActionResult> GetUserFavorites()
         {
-            var userIdClaim = User.FindFirst("StudentId") ?? User.FindFirst("DormitoryOwnerId");
+            // Log the token claims
+            var userClaims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
+            _logger.LogInformation("User claims: {@UserClaims}", userClaims);
+
+            var roleClaim = User.FindFirst(ClaimTypes.Role);
+            if (roleClaim == null)
+            {
+                _logger.LogWarning("Role claim not found in token");
+                return Unauthorized("Role claim not found in token");
+            }
+            var role = roleClaim.Value;
+            _logger.LogInformation("User role from token: {UserRole}", role);
+
+            Claim userIdClaim = null;
+            switch (role)
+            {
+                case "Student":
+                    userIdClaim = User.FindFirst("StudentId");
+                    break;
+                case "DormitoryOwner":
+                    userIdClaim = User.FindFirst("DormitoryOwnerId");
+                    break;
+                case "Administrator":
+                    userIdClaim = User.FindFirst("AdministratorId");
+                    break;
+            }
+
             if (userIdClaim == null)
             {
+                _logger.LogWarning("User ID claim not found in token for role {Role}", role);
                 return Unauthorized("User ID claim not found in token");
             }
+
             var userId = int.Parse(userIdClaim.Value);
+            _logger.LogInformation("User ID from token: {UserId}", userId);
 
-            var userTypeClaim = User.FindFirst(ClaimTypes.Role);
-            if (userTypeClaim == null)
-            {
-                return Unauthorized("User role claim not found in token");
-            }
-            var userType = userTypeClaim.Value;
-
-            var favoriteListId = await _favoriteListService.GetFavoriteListIdAsync(userId, userType);
+            var favoriteListId = await _favoriteListService.GetFavoriteListIdAsync(userId, role);
             if (favoriteListId == null)
             {
                 return StatusCode(500, "Failed to retrieve favorite list ID");

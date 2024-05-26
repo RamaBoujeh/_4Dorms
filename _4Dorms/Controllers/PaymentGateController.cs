@@ -17,7 +17,7 @@ namespace _4Dorms.Controllers
         }
 
         [HttpPost("process")]
-        public async Task<IActionResult> ProcessPayment([FromBody] PaymentGateDTO paymentDto) // Add [FromBody]
+        public async Task<IActionResult> ProcessPayment([FromBody] PaymentGateDTO paymentDto)
         {
             if (!ModelState.IsValid)
             {

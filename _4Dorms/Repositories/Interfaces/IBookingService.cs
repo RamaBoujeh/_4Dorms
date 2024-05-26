@@ -6,5 +6,6 @@ namespace _4Dorms.Repositories.Interfaces
     {
         Task<bool> BookingAsync(BookingDTO bookingDTO);
 
+
     }
 }

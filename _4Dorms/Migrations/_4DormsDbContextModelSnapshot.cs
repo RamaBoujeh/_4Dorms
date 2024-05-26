@@ -66,7 +66,7 @@ namespace _4Dorms.Migrations
 
                     b.HasKey("AdministratorId");
 
-                    b.ToTable("Administrators");
+                    b.ToTable("Administrators", (string)null);
 
                     b.HasData(
                         new
@@ -121,7 +121,7 @@ namespace _4Dorms.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("DormitoriesBooking");
+                    b.ToTable("DormitoriesBooking", (string)null);
                 });
 
             modelBuilder.Entity("_4Dorms.Models.Dormitory", b =>
@@ -186,7 +186,7 @@ namespace _4Dorms.Migrations
 
                     b.HasIndex("DormitoryOwnerId");
 
-                    b.ToTable("Dormitories");
+                    b.ToTable("Dormitories", (string)null);
                 });
 
             modelBuilder.Entity("_4Dorms.Models.DormitoryImage", b =>
@@ -208,7 +208,7 @@ namespace _4Dorms.Migrations
 
                     b.HasIndex("DormitoryId");
 
-                    b.ToTable("DormitoryImages");
+                    b.ToTable("DormitoryImages", (string)null);
                 });
 
             modelBuilder.Entity("_4Dorms.Models.DormitoryOwner", b =>
@@ -247,7 +247,7 @@ namespace _4Dorms.Migrations
 
                     b.HasKey("DormitoryOwnerId");
 
-                    b.ToTable("DormitoryOwners");
+                    b.ToTable("DormitoryOwners", (string)null);
                 });
 
             modelBuilder.Entity("_4Dorms.Models.FavoriteList", b =>
@@ -270,7 +270,7 @@ namespace _4Dorms.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("FavoriteLists");
+                    b.ToTable("FavoriteLists", (string)null);
                 });
 
             modelBuilder.Entity("_4Dorms.Models.LogIn", b =>
@@ -291,7 +291,7 @@ namespace _4Dorms.Migrations
 
                     b.HasKey("LoginId");
 
-                    b.ToTable("LogIn");
+                    b.ToTable("LogIn", (string)null);
                 });
 
             modelBuilder.Entity("_4Dorms.Models.PaymentGate", b =>
@@ -320,7 +320,7 @@ namespace _4Dorms.Migrations
 
                     b.HasKey("PaymentGateId");
 
-                    b.ToTable("PaymentGateways");
+                    b.ToTable("PaymentGateways", (string)null);
                 });
 
             modelBuilder.Entity("_4Dorms.Models.Review", b =>
@@ -354,7 +354,7 @@ namespace _4Dorms.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Reviews");
+                    b.ToTable("Reviews", (string)null);
                 });
 
             modelBuilder.Entity("_4Dorms.Models.Room", b =>
@@ -384,7 +384,7 @@ namespace _4Dorms.Migrations
 
                     b.HasIndex("DormitoryId");
 
-                    b.ToTable("Rooms");
+                    b.ToTable("Rooms", (string)null);
                 });
 
             modelBuilder.Entity("_4Dorms.Models.Student", b =>
@@ -427,7 +427,7 @@ namespace _4Dorms.Migrations
 
                     b.HasKey("StudentId");
 
-                    b.ToTable("Students");
+                    b.ToTable("Students", (string)null);
                 });
 
             modelBuilder.Entity("DormitoryFavoriteList", b =>

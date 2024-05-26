@@ -49,9 +49,16 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAuthorization();
+builder.Services.AddControllers();
+
+/*builder.Services.AddDbContext<_4DormsDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));*/
 
 builder.Services.AddDbContext<_4DormsDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+           .EnableSensitiveDataLogging()
+           .UseLoggerFactory(LoggerFactory.Create(builder => { builder.AddConsole(); }))
+);
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDormitoryService, DormitoryService>();
@@ -102,6 +109,11 @@ app.UseCors("AllowedOriginsPolicy"); // Use the CORS policy
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
 
 app.MapControllers();
 

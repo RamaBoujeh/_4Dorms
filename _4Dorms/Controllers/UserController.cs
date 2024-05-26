@@ -13,7 +13,7 @@ using System.Security.Cryptography;
 
 namespace _4Dorms.Controllers
     {
-    [ApiController]
+    [ApiController] 
     [Route("api/[Controller]")]
     public class UserController : ControllerBase
     {

@@ -1,7 +1,12 @@
 ﻿using _4Dorms.Persistance;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using _4Dorms.Models;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace _4Dorms.GenericRepo
 {
@@ -9,6 +14,7 @@ namespace _4Dorms.GenericRepo
     {
         private readonly _4DormsDbContext _context;
         private readonly DbSet<T> _entities;
+        private IDbContextTransaction _transaction; // Transaction support
 
         public GenericRepository(_4DormsDbContext context)
         {
@@ -65,13 +71,11 @@ namespace _4Dorms.GenericRepo
             return _entities.AsQueryable();
         }
 
-        // AddRange method to add multiple entities of any type
         public async Task AddRange(IEnumerable<T> entities)
         {
             await _entities.AddRangeAsync(entities);
         }
 
-        // Specific method for adding DormitoryImage entities
         public async Task AddDormitoryImagesRange(IEnumerable<DormitoryImage> dormitoryImages)
         {
             await _context.DormitoryImages.AddRangeAsync(dormitoryImages);
@@ -100,6 +104,36 @@ namespace _4Dorms.GenericRepo
         public async Task<List<T>> GetListByConditionAsync(Expression<Func<T, bool>> predicate)
         {
             return await _entities.Where(predicate).ToListAsync();
+        }
+
+        // Transaction support methods
+        public async Task BeginTransactionAsync()
+        {
+            _transaction = await _context.Database.BeginTransactionAsync();
+        }
+
+        public async Task CommitTransactionAsync()
+        {
+            try
+            {
+                await _context.SaveChangesAsync();
+                await _transaction.CommitAsync();
+            }
+            catch
+            {
+                await _transaction.RollbackAsync();
+                throw;
+            }
+            finally
+            {
+                await _transaction.DisposeAsync();
+            }
+        }
+
+        public async Task RollbackTransactionAsync()
+        {
+            await _transaction.RollbackAsync();
+            await _transaction.DisposeAsync();
         }
     }
 }

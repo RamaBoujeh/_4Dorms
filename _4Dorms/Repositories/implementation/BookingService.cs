@@ -2,43 +2,90 @@
 using _4Dorms.Models;
 using _4Dorms.Repositories.Interfaces;
 using _4Dorms.Resources;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
-namespace _4Dorms.Repositories.implementation
+namespace _4Dorms.Repositories.Implementation
 {
     public class BookingService : IBookingService
     {
         private readonly IGenericRepository<Booking> _bookingRepository;
         private readonly IGenericRepository<Room> _roomRepository;
+        private readonly ILogger<BookingService> _logger;
 
-        public BookingService(IGenericRepository<Booking> bookingRepository, IGenericRepository<Room> roomRepository)
+        public BookingService(IGenericRepository<Booking> bookingRepository, IGenericRepository<Room> roomRepository, ILogger<BookingService> logger)
         {
             _bookingRepository = bookingRepository;
             _roomRepository = roomRepository;
+            _logger = logger;
         }
 
         public async Task<bool> BookingAsync(BookingDTO bookingDTO)
         {
+            await _bookingRepository.BeginTransactionAsync(); // Start transaction
+
             try
             {
-                var room = await _roomRepository.GetByIdAsync(bookingDTO.RoomId);
+                var room = await _roomRepository.Query()
+                    .Include(r => r.Dormitory)
+                    .FirstOrDefaultAsync(r => r.RoomID == bookingDTO.RoomId);
+
                 if (room == null)
                 {
-                    Console.Error.WriteLine($"Room with ID {bookingDTO.RoomId} not found.");
+                    _logger.LogError($"Room with ID {bookingDTO.RoomId} not found.");
+                    await _bookingRepository.RollbackTransactionAsync();
                     return false;
                 }
 
-                if (bookingDTO.RoomType == RoomType.Private && room.NumOfPrivateRooms > 0)
+                if (room.Dormitory == null)
                 {
-                    room.NumOfPrivateRooms--;
+                    _logger.LogError($"Dormitory for Room ID {bookingDTO.RoomId} not found.");
+                    await _bookingRepository.RollbackTransactionAsync();
+                    return false;
                 }
-                else if (bookingDTO.RoomType == RoomType.Shared && room.NumOfSharedRooms > 0)
+
+                bool roomUpdated = false;
+
+                if (bookingDTO.RoomType == RoomType.Private)
                 {
-                    room.NumOfSharedRooms--;
+                    if (room.NumOfPrivateRooms > 0)
+                    {
+                        room.NumOfPrivateRooms--;
+                        roomUpdated = true;
+                    }
+                    else
+                    {
+                        _logger.LogError($"No available private rooms. Room ID: {bookingDTO.RoomId}");
+                        await _bookingRepository.RollbackTransactionAsync();
+                        return false;
+                    }
+                }
+                else if (bookingDTO.RoomType == RoomType.Shared)
+                {
+                    if (room.NumOfSharedRooms > 0)
+                    {
+                        room.NumOfSharedRooms--;
+                        roomUpdated = true;
+                    }
+                    else
+                    {
+                        _logger.LogError($"No available shared rooms. Room ID: {bookingDTO.RoomId}");
+                        await _bookingRepository.RollbackTransactionAsync();
+                        return false;
+                    }
                 }
                 else
                 {
-                    Console.Error.WriteLine($"No available rooms of type {bookingDTO.RoomType}.");
-                    return false; // No available rooms of the selected type
+                    _logger.LogError($"Invalid room type. Room ID: {bookingDTO.RoomId}, Room Type: {bookingDTO.RoomType}");
+                    await _bookingRepository.RollbackTransactionAsync();
+                    return false;
+                }
+
+                if (roomUpdated)
+                {
+                    _roomRepository.Update(room);
                 }
 
                 var booking = new Booking
@@ -47,24 +94,65 @@ namespace _4Dorms.Repositories.implementation
                     DormitoryId = bookingDTO.DormitoryId,
                     StudentId = bookingDTO.StudentId,
                     Duration = bookingDTO.Duration,
-                    RoomType = bookingDTO.RoomType
+                    RoomType = bookingDTO.RoomType,
+                    DormitoryOwnerId = room.Dormitory.DormitoryOwnerId,
                 };
 
-                _bookingRepository.Add(booking);
+                await _bookingRepository.Add(booking);
 
-                var bookingSaveResult = await _bookingRepository.SaveChangesAsync();
-                var roomSaveResult = await _roomRepository.SaveChangesAsync();
+                var bookingSaveResult = false;
+                var roomSaveResult = true;
 
-                Console.WriteLine($"Booking save result: {bookingSaveResult}, Room save result: {roomSaveResult}");
+                try
+                {
+                    bookingSaveResult = await _bookingRepository.SaveChangesAsync();
+                    _logger.LogInformation($"Booking save result: {bookingSaveResult}");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Error saving booking: {ex.Message}");
+                    _logger.LogError(ex.StackTrace);
+                }
 
-                return bookingSaveResult && roomSaveResult;
+                try
+                {
+                    roomSaveResult = await _roomRepository.SaveChangesAsync();
+                    _logger.LogInformation($"Room save result: {roomSaveResult}");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Error saving room: {ex.Message}");
+                    _logger.LogError(ex.StackTrace);
+                }
+
+                if (bookingSaveResult)
+                {
+                    await _bookingRepository.CommitTransactionAsync(); // Commit transaction if all operations succeed
+                    return true;
+                }
+                else
+                {
+                    _logger.LogError("Failed to save booking or update room.");
+                    await _bookingRepository.RollbackTransactionAsync(); // Rollback transaction if any operation fails
+                    return false;
+                }
+            }
+            catch (DbUpdateException dbEx)
+            {
+                await _bookingRepository.RollbackTransactionAsync(); // Ensure rollback on exception
+                _logger.LogError($"Database update error in BookingAsync: {dbEx.Message}");
+                _logger.LogError(dbEx.StackTrace);
+                return false;
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error in RequestBookingAsync: {ex.Message}");
-                Console.Error.WriteLine(ex.StackTrace);
+                await _bookingRepository.RollbackTransactionAsync(); // Ensure rollback on exception
+                _logger.LogError($"Error in BookingAsync: {ex.Message}");
+                _logger.LogError(ex.StackTrace);
                 return false;
             }
         }
+
+
     }
 }

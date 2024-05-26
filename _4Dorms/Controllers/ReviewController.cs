@@ -1,6 +1,7 @@
 ﻿using _4Dorms.Repositories.Interfaces;
 using _4Dorms.Resources;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace _4Dorms.Controllers
 {

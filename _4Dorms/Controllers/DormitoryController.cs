@@ -55,7 +55,16 @@ namespace _4Dorms.Controllers
             }
         }
 
-
+        [HttpGet("dormitoryDetails/{dormitoryId}")]
+        public async Task<IActionResult> GetDormitoryDetails(int dormitoryId)
+        {
+            var dormitory = await _dormitoryService.GetDormitoryDetailsAsync(dormitoryId);
+            if (dormitory == null)
+            {
+                return NotFound();
+            }
+            return Ok(dormitory);
+        }
 
         [HttpGet("search")]
         public async Task<ActionResult<List<Dormitory>>> SearchDormitoriesAsync([FromQuery] string keywords, [FromQuery] string city, [FromQuery] string nearbyUniversity, [FromQuery] string genderType)
