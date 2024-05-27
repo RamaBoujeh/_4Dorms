@@ -38,5 +38,14 @@ public class BookingController : ControllerBase
         }
     }
 
-
+    [HttpGet("hasBooking/{dormitoryId}/{studentId}")]
+    public async Task<IActionResult> HasBooking(int dormitoryId, int studentId)
+    {
+        var hasBooking = await _bookingService.HasCompletedBookingAsync(dormitoryId, studentId);
+        if (hasBooking)
+        {
+            return Ok(true);
+        }
+        return Ok(false);
+    }
 }

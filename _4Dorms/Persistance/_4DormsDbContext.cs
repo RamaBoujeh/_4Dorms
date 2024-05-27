@@ -52,6 +52,15 @@ namespace _4Dorms.Persistance
                 .HasColumnType("decimal(18,2)");
 
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<FavoriteList>()
+            .HasMany(fl => fl.Dormitories)
+            .WithMany(d => d.Favorites)
+            .UsingEntity<Dictionary<string, object>>(
+                "DormitoryFavoriteList",
+                j => j.HasOne<Dormitory>().WithMany().HasForeignKey("DormitoryId"),
+                j => j.HasOne<FavoriteList>().WithMany().HasForeignKey("FavoriteListId")
+            );
         }
 
     }

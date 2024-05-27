@@ -153,6 +153,11 @@ namespace _4Dorms.Repositories.Implementation
             }
         }
 
+        public async Task<bool> HasCompletedBookingAsync(int dormitoryId, int studentId)
+        {
+            return await _bookingRepository.Query()
+                .AnyAsync(b => b.DormitoryId == dormitoryId && b.StudentId == studentId);
+        }
 
     }
 }

@@ -1,10 +1,8 @@
 ﻿using _4Dorms.GenericRepo;
 using _4Dorms.Models;
 using _4Dorms.Repositories.Interfaces;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace _4Dorms.Repositories.Implementation
 {
@@ -72,7 +70,8 @@ namespace _4Dorms.Repositories.Implementation
                 switch (userType)
                 {
                     case "Student":
-                        var studentFavoriteList = await _favoriteListRepository.FindByConditionAsync(f => f.StudentId == userId);
+                        var studentFavoriteList = await _favoriteListRepository.Query()
+                            .FirstOrDefaultAsync(f => f.StudentId == userId);
                         if (studentFavoriteList == null)
                         {
                             _logger.LogWarning("No favorite list found for student with ID {UserId}", userId);
@@ -82,7 +81,8 @@ namespace _4Dorms.Repositories.Implementation
                         return studentFavoriteList.FavoriteId;
 
                     case "DormitoryOwner":
-                        var ownerFavoriteList = await _favoriteListRepository.FindByConditionAsync(f => f.DormitoryOwnerId == userId);
+                        var ownerFavoriteList = await _favoriteListRepository.Query()
+                            .FirstOrDefaultAsync(f => f.DormitoryOwnerId == userId);
                         if (ownerFavoriteList == null)
                         {
                             _logger.LogWarning("No favorite list found for dormitory owner with ID {UserId}", userId);
@@ -105,10 +105,10 @@ namespace _4Dorms.Repositories.Implementation
 
         public async Task<FavoriteList> GetFavoriteListByIdAsync(int favoriteListId)
         {
-            return await _favoriteListRepository.GetByIdAsync(favoriteListId);
+            return await _favoriteListRepository.Query()
+                .Include(f => f.Dormitories) // Eagerly load dormitories
+                .FirstOrDefaultAsync(f => f.FavoriteId == favoriteListId);
         }
-
-
 
         public async Task<bool> RemoveDormitoryFromFavoritesAsync(int favoriteListId, int dormitoryId)
         {
@@ -116,7 +116,10 @@ namespace _4Dorms.Repositories.Implementation
             {
                 _logger.LogInformation("Attempting to remove dormitory with ID {DormitoryId} from favorite list with ID {FavoriteListId}", dormitoryId, favoriteListId);
 
-                var favoriteList = await _favoriteListRepository.GetByIdAsync(favoriteListId);
+                var favoriteList = await _favoriteListRepository.Query()
+                    .Include(f => f.Dormitories)
+                    .FirstOrDefaultAsync(f => f.FavoriteId == favoriteListId);
+
                 if (favoriteList == null)
                 {
                     _logger.LogWarning("Favorite list with ID {FavoriteListId} not found", favoriteListId);
@@ -130,7 +133,7 @@ namespace _4Dorms.Repositories.Implementation
                     return false;
                 }
 
-                if (!favoriteList.Dormitories.Contains(dormitory))
+                if (!favoriteList.Dormitories.Any(d => d.DormitoryId == dormitoryId))
                 {
                     _logger.LogInformation("Dormitory with ID {DormitoryId} is not in the favorite list with ID {FavoriteListId}", dormitoryId, favoriteListId);
                     return true; // Already removed, return true

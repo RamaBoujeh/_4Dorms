@@ -12,7 +12,11 @@ using _4Dorms.Repositories.implementation;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+    options.JsonSerializerOptions.WriteIndented = true;
+});
 
 // Add CORS services and configure the policy to allow only the specified origin
 builder.Services.AddCors(options =>

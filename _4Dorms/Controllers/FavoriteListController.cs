@@ -73,7 +73,6 @@ namespace _4Dorms.Controllers
         [HttpGet("user-favorites")]
         public async Task<IActionResult> GetUserFavorites()
         {
-            // Log the token claims
             var userClaims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
             _logger.LogInformation("User claims: {@UserClaims}", userClaims);
 
@@ -121,20 +120,26 @@ namespace _4Dorms.Controllers
                 return NotFound("No favorite dormitories found");
             }
 
-            return Ok(favoriteList.Dormitories);
-        }
-
-        [HttpDelete("{favoriteListId}/remove")]
-        public async Task<IActionResult> RemoveDormitoryFromFavorites(int favoriteListId, [FromBody] int dormitoryId)
-        {
-            var result = await _favoriteListService.RemoveDormitoryFromFavoritesAsync(favoriteListId, dormitoryId);
-
-            if (result)
+            var favoriteDormitories = favoriteList.Dormitories.Select(d => new
             {
-                return Ok(new { Message = "Dormitory removed from favorites successfully." });
-            }
+                d.DormitoryId,
+                d.DormitoryName,
+                d.GenderType,
+                d.City,
+                d.NearbyUniversity,
+                d.phone,
+                d.Email,
+                d.DormitoryDescription,
+                d.Location,
+                d.PriceHalfYear,
+                d.PriceFullYear,
+                d.Status,
+                d.DormitoryOwnerId,
+                d.AdministratorId
+            }).ToList();
 
-            return BadRequest(new { Message = "Failed to remove dormitory from favorites." });
+            return Ok(favoriteDormitories);
         }
+
     }
 }
