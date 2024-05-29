@@ -3,6 +3,7 @@ using _4Dorms.Repositories.Interfaces;
 using _4Dorms.Resources;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace _4Dorms.Controllers
 {
@@ -11,9 +12,12 @@ namespace _4Dorms.Controllers
     public class DormitoryController : ControllerBase
     {
         private readonly IDormitoryService _dormitoryService;
-        public DormitoryController(IDormitoryService dormitoryService)
+        private readonly ILogger<DormitoryController> _logger;
+
+        public DormitoryController(IDormitoryService dormitoryService, ILogger<DormitoryController> logger)
         {
-            _dormitoryService = dormitoryService;  
+            _dormitoryService = dormitoryService;
+            _logger = logger;
         }
 
         [HttpGet("dormitory/{id}")]
@@ -22,10 +26,11 @@ namespace _4Dorms.Controllers
             var dormitory = await _dormitoryService.GetDormitoryByIdAsync(id);
             if (dormitory == null)
             {
+                _logger.LogWarning("Dormitory not found with id {DormitoryId}", id);
                 return NotFound("Dormitory not found.");
             }
             return Ok(dormitory);
-        }   
+        }
 
         [HttpGet("pending")]
         public async Task<ActionResult<List<Dormitory>>> GetPendingDormsAsync()
@@ -37,6 +42,7 @@ namespace _4Dorms.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error fetching pending dormitories");
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
@@ -51,6 +57,7 @@ namespace _4Dorms.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error fetching approved dormitories");
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
@@ -61,6 +68,7 @@ namespace _4Dorms.Controllers
             var dormitory = await _dormitoryService.GetDormitoryDetailsAsync(dormitoryId);
             if (dormitory == null)
             {
+                _logger.LogWarning("Dormitory details not found with id {DormitoryId}", dormitoryId);
                 return NotFound();
             }
             return Ok(dormitory);
@@ -76,9 +84,9 @@ namespace _4Dorms.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error searching dormitories");
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-
     }
 }

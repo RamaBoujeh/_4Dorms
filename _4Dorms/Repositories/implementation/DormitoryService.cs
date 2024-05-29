@@ -2,7 +2,6 @@
 using _4Dorms.Models;
 using _4Dorms.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Data.Entity;
 
 namespace _4Dorms.Repositories.implementation
 {
@@ -11,12 +10,16 @@ namespace _4Dorms.Repositories.implementation
         private readonly IGenericRepository<Dormitory> _genericRepositoryDorm;
         private readonly IGenericRepository<Student> _genericRepositoryStudent;
         private readonly IGenericRepository<DormitoryOwner> _genericRepositoryOwner;
+        private readonly ILogger<DormitoryService> _logger;
 
-        public DormitoryService(IGenericRepository<Dormitory> genericRepositoryDorm, IGenericRepository<Student> genericRepositoryStudent, IGenericRepository<DormitoryOwner> genericRepositoryOwner)
+        public DormitoryService(IGenericRepository<Dormitory> genericRepositoryDorm, IGenericRepository<Student> genericRepositoryStudent,
+            IGenericRepository<DormitoryOwner> genericRepositoryOwner, ILogger<DormitoryService> logger)
         {
             _genericRepositoryDorm = genericRepositoryDorm;
             _genericRepositoryStudent = genericRepositoryStudent;
             _genericRepositoryOwner = genericRepositoryOwner;
+            _logger = logger;
+
         }
 
         public async Task<Dormitory> GetDormitoryByIdAsync(int dormitoryId)
@@ -45,7 +48,20 @@ namespace _4Dorms.Repositories.implementation
 
         public async Task<List<Dormitory>> GetDormsByStatusAsync(DormitoryStatus status)
         {
-            return await _genericRepositoryDorm.GetListByConditionAsync(d => d.Status == status);
+            _logger.LogInformation("Fetching dormitories with status: {Status}", status);
+            try
+            {
+                var dormitories = await _genericRepositoryDorm.Query()
+                    .Where(d => d.Status == status)
+                    .ToListAsync();
+                _logger.LogInformation("Fetched {Count} dormitories", dormitories.Count);
+                return dormitories;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while querying dormitories by status.");
+                throw;
+            }
         }
 
         public async Task<Dormitory> GetDormitoryDetailsAsync(int dormitoryId)
@@ -53,6 +69,7 @@ namespace _4Dorms.Repositories.implementation
             var dorm = await _genericRepositoryDorm.GetByIdAsync(dormitoryId);
             return dorm;
         }
+
 
     }
 }
