@@ -19,8 +19,10 @@ namespace _4Dorms.GenericRepo
         Task<DormitoryOwner> DormOwnerGetByEmailAndPasswordAsync(string email, string password);
         Task<Administrator> AdminGetByEmailAndPasswordAsync(string email, string password);
         Task<List<T>> GetListByConditionAsync(Expression<Func<T, bool>> predicate);
+        Task<IEnumerable<Dormitory>> SearchDormitoriesAsync(Expression<Func<Dormitory, bool>> predicate);
         Task BeginTransactionAsync();
         Task CommitTransactionAsync();
         Task RollbackTransactionAsync();
+
     }
 }

@@ -50,13 +50,32 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = "YourAudience", // Replace with your audience
         IssuerSigningKey = new SymmetricSecurityKey(key)
     };
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = context =>
+        {
+            var claims = context.Principal.Claims.Select(c => new { c.Type, c.Value }).ToList();
+            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+            logger.LogInformation("Token claims: {@Claims}", claims);
+            return Task.CompletedTask;
+        },
+        OnAuthenticationFailed = context =>
+        {
+            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+            logger.LogError(context.Exception, "Authentication failed");
+            return Task.CompletedTask;
+        }
+    };
 });
 
-builder.Services.AddAuthorization();
-builder.Services.AddControllers();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("StudentPolicy", policy => policy.RequireClaim("role", "Student"));
+    options.AddPolicy("DormitoryOwnerPolicy", policy => policy.RequireClaim("role", "DormitoryOwner"));
+    options.AddPolicy("AdministratorPolicy", policy => policy.RequireClaim("role", "Administrator"));
+});
 
-/*builder.Services.AddDbContext<_4DormsDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));*/
+builder.Services.AddControllers();
 
 builder.Services.AddDbContext<_4DormsDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))

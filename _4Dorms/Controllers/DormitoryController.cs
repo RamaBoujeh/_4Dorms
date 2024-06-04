@@ -55,9 +55,8 @@ namespace _4Dorms.Controllers
                 var approvedDorms = await _dormitoryService.GetDormsByStatusAsync(DormitoryStatus.Approved);
                 return Ok(approvedDorms);
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
-                _logger.LogError(ex, "Error fetching approved dormitories");
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
@@ -84,9 +83,9 @@ namespace _4Dorms.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error searching dormitories");
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
     }
 }

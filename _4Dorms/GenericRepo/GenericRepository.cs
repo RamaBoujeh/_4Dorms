@@ -1,12 +1,9 @@
 ﻿using _4Dorms.Persistance;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using _4Dorms.Models;
 using Microsoft.EntityFrameworkCore.Storage;
+
 
 namespace _4Dorms.GenericRepo
 {
@@ -105,7 +102,10 @@ namespace _4Dorms.GenericRepo
         {
             return await _entities.Where(predicate).ToListAsync();
         }
-
+        public async Task<IEnumerable<Dormitory>> SearchDormitoriesAsync(Expression<Func<Dormitory, bool>> predicate)
+        {
+            return await _context.Dormitories.Include(d => d.ImageUrls).Where(predicate).ToListAsync();
+        }
         // Transaction support methods
         public async Task BeginTransactionAsync()
         {

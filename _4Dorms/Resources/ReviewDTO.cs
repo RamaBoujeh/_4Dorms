@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace _4Dorms.Resources
@@ -18,5 +19,9 @@ namespace _4Dorms.Resources
         public int Rating { get; set; }
 
         public string Comment { get; set; }
+
+        public DateTime Date { get; set; }
+
+        public string StudentName { get; set; } // Assuming Review has a navigation property to Student
     }
 }

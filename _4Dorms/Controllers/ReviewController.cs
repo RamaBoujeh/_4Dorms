@@ -1,6 +1,8 @@
-﻿using _4Dorms.Repositories.Interfaces;
-using _4Dorms.Resources;
+﻿// ReviewController.cs
 using Microsoft.AspNetCore.Mvc;
+using _4Dorms.Repositories.Interfaces;
+using _4Dorms.Resources;
+using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
 namespace _4Dorms.Controllers
@@ -18,6 +20,20 @@ namespace _4Dorms.Controllers
             _logger = logger;
         }
 
+        [HttpGet("dormitory/{dormitoryId}")]
+        public async Task<IActionResult> GetReviewsByDormitory(int dormitoryId)
+        {
+            _logger.LogInformation($"Received request to fetch reviews for dormitory ID: {dormitoryId}");
+
+            var reviews = await _reviewService.GetReviewsByDormitoryAsync(dormitoryId);
+            if (reviews == null)
+            {
+                _logger.LogWarning("No reviews found for this dormitory.");
+                return NotFound("No reviews found for this dormitory.");
+            }
+            return Ok(reviews);
+        }
+
         [HttpPost("add")]
         public async Task<IActionResult> AddReview([FromBody] ReviewDTO reviewDTO)
         {
@@ -26,6 +42,8 @@ namespace _4Dorms.Controllers
                 _logger.LogWarning("Invalid review model state.");
                 return BadRequest(ModelState);
             }
+
+            _logger.LogInformation($"Received request to add review: {reviewDTO}");
 
             try
             {

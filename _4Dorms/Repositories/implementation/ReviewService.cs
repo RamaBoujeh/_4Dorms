@@ -1,6 +1,11 @@
 ﻿using _4Dorms.GenericRepo;
 using _4Dorms.Models;
 using _4Dorms.Repositories.Interfaces;
+using _4Dorms.Resources;
+using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace _4Dorms.Repositories.implementation
 {
@@ -19,7 +24,6 @@ namespace _4Dorms.Repositories.implementation
 
         public async Task<bool> AddReviewAsync(int dormitoryId, int studentId, int rating, string comment)
         {
-            // Check if the student has an approved booking for the specified dormitory
             var booking = await _bookingRepository.FindByConditionAsync(b => b.DormitoryId == dormitoryId && b.StudentId == studentId);
             if (booking == null)
             {
@@ -48,6 +52,20 @@ namespace _4Dorms.Repositories.implementation
                 _logger.LogError($"Failed to add review: {ex.Message}");
                 return false;
             }
+        }
+
+        public async Task<List<ReviewDTO>> GetReviewsByDormitoryAsync(int dormitoryId)
+        {
+            var reviews = await _reviewRepository.GetListByConditionAsync(r => r.DormitoryId == dormitoryId);
+            return reviews.Select(r => new ReviewDTO
+            {
+                DormitoryId = r.DormitoryId ?? 0,
+                StudentId = r.StudentId ?? 0,
+                Rating = r.Rating,
+                Comment = r.Comment,
+                Date = r.Date,
+                StudentName = r.Student != null ? r.Student.Name : "Unknown"
+            }).ToList();
         }
     }
 }

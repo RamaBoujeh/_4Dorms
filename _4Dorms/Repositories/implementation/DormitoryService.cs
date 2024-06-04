@@ -2,6 +2,7 @@
 using _4Dorms.Models;
 using _4Dorms.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace _4Dorms.Repositories.implementation
 {
@@ -29,33 +30,52 @@ namespace _4Dorms.Repositories.implementation
 
         public async Task<List<Dormitory>> SearchDormitoriesAsync(string keywords, string city, string nearbyUniversity, string genderType)
         {
-            var query = _genericRepositoryDorm.Query();
+            // Convert search parameters to lowercase for case-insensitive search
+            keywords = keywords?.ToLower();
+            city = city?.ToLower();
+            nearbyUniversity = nearbyUniversity?.ToLower();
+            genderType = genderType?.ToLower();
+
+            var query = _genericRepositoryDorm.Query().AsQueryable();
 
             if (!string.IsNullOrEmpty(keywords))
-                query = query.Where(d => d.DormitoryDescription.Contains(keywords));
+            {
+                query = query.Where(d =>
+                    d.DormitoryName.ToLower().Contains(keywords) ||
+                    d.City.ToLower().Contains(keywords) ||
+                    d.DormitoryDescription.ToLower().Contains(keywords) ||
+                    d.NearbyUniversity.ToLower().Contains(keywords) ||
+                    d.GenderType.ToLower().Contains(keywords));
+            }
 
             if (!string.IsNullOrEmpty(city))
-                query = query.Where(d => d.City == city);
+            {
+                query = query.Where(d => d.City.ToLower() == city);
+            }
 
             if (!string.IsNullOrEmpty(nearbyUniversity))
-                query = query.Where(d => d.NearbyUniversity == nearbyUniversity);
+            {
+                query = query.Where(d => d.NearbyUniversity.ToLower() == nearbyUniversity);
+            }
 
             if (!string.IsNullOrEmpty(genderType))
-                query = query.Where(d => d.GenderType == genderType);
+            {
+                query = query.Where(d => d.GenderType.ToLower() == genderType);
+            }
 
-            return await query.ToListAsync();
+            return await query.Include(d => d.ImageUrls).ToListAsync();
         }
+
 
         public async Task<List<Dormitory>> GetDormsByStatusAsync(DormitoryStatus status)
         {
             _logger.LogInformation("Fetching dormitories with status: {Status}", status);
             try
             {
-                var dormitories = await _genericRepositoryDorm.Query()
+                return await _genericRepositoryDorm.Query()
                     .Where(d => d.Status == status)
+                    .Include(d => d.ImageUrls)
                     .ToListAsync();
-                _logger.LogInformation("Fetched {Count} dormitories", dormitories.Count);
-                return dormitories;
             }
             catch (Exception ex)
             {
