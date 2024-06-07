@@ -81,6 +81,7 @@ builder.Services.AddDbContext<_4DormsDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
            .EnableSensitiveDataLogging()
            .UseLoggerFactory(LoggerFactory.Create(builder => { builder.AddConsole(); }))
+           .LogTo(Console.WriteLine, LogLevel.Information)
 );
 
 builder.Services.AddScoped<IUserService, UserService>();

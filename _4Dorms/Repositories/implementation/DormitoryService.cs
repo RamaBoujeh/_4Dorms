@@ -83,7 +83,10 @@ namespace _4Dorms.Repositories.implementation
                 throw;
             }
         }
-
+        public async Task<List<Dormitory>> GetDormsByOwnerIdAsync(int dormitoryOwnerId)
+        {
+            return await _genericRepositoryDorm.GetListByConditionAsync(d => d.DormitoryOwnerId == dormitoryOwnerId);
+        }
         public async Task<Dormitory> GetDormitoryDetailsAsync(int dormitoryId)
         {
             var dorm = await _genericRepositoryDorm.GetByIdAsync(dormitoryId);

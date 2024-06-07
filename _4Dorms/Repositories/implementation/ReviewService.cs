@@ -57,6 +57,13 @@ namespace _4Dorms.Repositories.implementation
         public async Task<List<ReviewDTO>> GetReviewsByDormitoryAsync(int dormitoryId)
         {
             var reviews = await _reviewRepository.GetListByConditionAsync(r => r.DormitoryId == dormitoryId);
+
+            _logger.LogInformation($"Reviews fetched from the database: {reviews.Count}");
+            foreach (var review in reviews)
+            {
+                _logger.LogInformation($"ReviewId: {review.ReviewId}, DormitoryId: {review.DormitoryId}, StudentId: {review.StudentId}, Comment: {review.Comment}");
+            }
+
             return reviews.Select(r => new ReviewDTO
             {
                 DormitoryId = r.DormitoryId ?? 0,
@@ -67,5 +74,6 @@ namespace _4Dorms.Repositories.implementation
                 StudentName = r.Student != null ? r.Student.Name : "Unknown"
             }).ToList();
         }
+
     }
 }

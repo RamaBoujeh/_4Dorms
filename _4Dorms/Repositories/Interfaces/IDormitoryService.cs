@@ -9,5 +9,6 @@ namespace _4Dorms.Repositories.Interfaces
         Task<List<Dormitory>> SearchDormitoriesAsync(string keywords, string city, string nearbyUniversity, string genderType);
         Task<List<Dormitory>> GetDormsByStatusAsync(DormitoryStatus status);
         Task<Dormitory> GetDormitoryDetailsAsync(int dormitoryId);
+        Task<List<Dormitory>> GetDormsByOwnerIdAsync(int dormitoryOwnerId);
     }
 }

@@ -52,22 +52,22 @@ namespace _4Dorms.Repositories.Implementation
             if (dormitoryDTO.ImageUrls != null && dormitoryDTO.ImageUrls.Any())
             {
                 var imageUrls = dormitoryDTO.ImageUrls.Select(url => new DormitoryImage { Url = url, DormitoryId = dormitory.DormitoryId }).ToList();
+                await _genericRepositoryDormitoryImage.AddRange(imageUrls);
+                await _genericRepositoryDormitoryImage.SaveChangesAsync();
                 foreach (var imageUrl in imageUrls)
                 {
-                    await _genericRepositoryDormitoryImage.Add(imageUrl);
                     _logger.LogInformation("Saved image with URL: {Url} for Dormitory ID: {DormitoryId}", imageUrl.Url, dormitory.DormitoryId);
                 }
-                await _genericRepositoryDormitoryImage.SaveChangesAsync();
             }
 
             if (dormitoryDTO.RoomDTO != null)
             {
                 var room = new Room
                 {
-                    PrivateRoom = dormitoryDTO.RoomDTO.PrivateRoom,
-                    SharedRoom = dormitoryDTO.RoomDTO.SharedRoom,
-                    NumOfPrivateRooms = dormitoryDTO.RoomDTO.NumOfPrivateRooms,
-                    NumOfSharedRooms = dormitoryDTO.RoomDTO.NumOfSharedRooms,
+                    PrivateRoom = dormitoryDTO.RoomDTO.PrivateRoom ?? false,
+                    SharedRoom = dormitoryDTO.RoomDTO.SharedRoom ?? false,
+                    NumOfPrivateRooms = dormitoryDTO.RoomDTO.NumOfPrivateRooms ?? 0,
+                    NumOfSharedRooms = dormitoryDTO.RoomDTO.NumOfSharedRooms ?? 0,
                     DormitoryId = dormitory.DormitoryId
                 };
 
@@ -76,8 +76,6 @@ namespace _4Dorms.Repositories.Implementation
                 _logger.LogInformation("Room saved for Dormitory ID: {DormitoryId}", dormitory.DormitoryId);
             }
         }
-
-
 
 
         public async Task UpdateDormitoryAsync(int dormitoryId, DormitoryDTO updatedDormitoryDTO)

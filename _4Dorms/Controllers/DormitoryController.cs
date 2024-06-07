@@ -73,6 +73,25 @@ namespace _4Dorms.Controllers
             return Ok(dormitory);
         }
 
+        [HttpGet("owner/{ownerId}")]
+        public async Task<ActionResult<List<Dormitory>>> GetDormsByOwnerId(int ownerId)
+        {
+            try
+            {
+                var dorms = await _dormitoryService.GetDormsByOwnerIdAsync(ownerId);
+                if (dorms == null)
+                {
+                    return NotFound("No dormitories found for this owner.");
+                }
+                return Ok(dorms);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching dormitories by owner ID");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         [HttpGet("search")]
         public async Task<ActionResult<List<Dormitory>>> SearchDormitoriesAsync([FromQuery] string keywords, [FromQuery] string city, [FromQuery] string nearbyUniversity, [FromQuery] string genderType)
         {
