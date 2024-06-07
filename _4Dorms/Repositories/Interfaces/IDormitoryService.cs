@@ -10,5 +10,6 @@ namespace _4Dorms.Repositories.Interfaces
         Task<List<Dormitory>> GetDormsByStatusAsync(DormitoryStatus status);
         Task<Dormitory> GetDormitoryDetailsAsync(int dormitoryId);
         Task<List<Dormitory>> GetDormsByOwnerIdAsync(int dormitoryOwnerId);
+        Task AddDormitoryImageAsync(DormitoryImage dormitoryImage);
     }
 }

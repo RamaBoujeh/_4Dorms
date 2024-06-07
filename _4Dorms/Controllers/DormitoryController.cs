@@ -20,6 +20,36 @@ namespace _4Dorms.Controllers
             _logger = logger;
         }
 
+        [HttpPost("upload-image")]
+        public async Task<IActionResult> UploadDormitoryImage(IFormFile imageFile, int dormitoryId)
+        {
+            if (imageFile == null || imageFile.Length == 0)
+                return BadRequest("Image file is required.");
+
+            var uploadPath = Path.Combine("wwwroot", "uploads", "dormitoryImages");
+            Directory.CreateDirectory(uploadPath);
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+            var filePath = Path.Combine(uploadPath, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await imageFile.CopyToAsync(stream);
+            }
+
+            var imageUrl = $"/uploads/dormitoryImages/{fileName}";
+
+            var dormitoryImage = new DormitoryImage
+            {
+                DormitoryId = dormitoryId,
+                Url = imageUrl
+            };
+
+            await _dormitoryService.AddDormitoryImageAsync(dormitoryImage);
+
+            return Ok(new { imageUrl });
+        }
+
+
         [HttpGet("dormitory/{id}")]
         public async Task<IActionResult> GetDormitoryById(int id)
         {
@@ -91,6 +121,7 @@ namespace _4Dorms.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
 
         [HttpGet("search")]
         public async Task<ActionResult<List<Dormitory>>> SearchDormitoriesAsync([FromQuery] string keywords, [FromQuery] string city, [FromQuery] string nearbyUniversity, [FromQuery] string genderType)

@@ -11,14 +11,16 @@ namespace _4Dorms.Repositories.implementation
         private readonly IGenericRepository<Dormitory> _genericRepositoryDorm;
         private readonly IGenericRepository<Student> _genericRepositoryStudent;
         private readonly IGenericRepository<DormitoryOwner> _genericRepositoryOwner;
+        private readonly IGenericRepository<DormitoryImage> _genericRepositoryImage;
         private readonly ILogger<DormitoryService> _logger;
 
         public DormitoryService(IGenericRepository<Dormitory> genericRepositoryDorm, IGenericRepository<Student> genericRepositoryStudent,
-            IGenericRepository<DormitoryOwner> genericRepositoryOwner, ILogger<DormitoryService> logger)
+            IGenericRepository<DormitoryOwner> genericRepositoryOwner, ILogger<DormitoryService> logger, IGenericRepository<DormitoryImage> genericRepositoryImage)
         {
             _genericRepositoryDorm = genericRepositoryDorm;
             _genericRepositoryStudent = genericRepositoryStudent;
             _genericRepositoryOwner = genericRepositoryOwner;
+            _genericRepositoryImage = genericRepositoryImage;
             _logger = logger;
 
         }
@@ -85,7 +87,15 @@ namespace _4Dorms.Repositories.implementation
         }
         public async Task<List<Dormitory>> GetDormsByOwnerIdAsync(int dormitoryOwnerId)
         {
-            return await _genericRepositoryDorm.GetListByConditionAsync(d => d.DormitoryOwnerId == dormitoryOwnerId);
+            return await _genericRepositoryDorm.Query()
+                .Where(d => d.DormitoryOwnerId == dormitoryOwnerId)
+                .Include(d => d.ImageUrls)
+                .ToListAsync();
+        }
+
+        public async Task AddDormitoryImageAsync(DormitoryImage dormitoryImage)
+        {
+            await _genericRepositoryImage.Add(dormitoryImage);
         }
         public async Task<Dormitory> GetDormitoryDetailsAsync(int dormitoryId)
         {

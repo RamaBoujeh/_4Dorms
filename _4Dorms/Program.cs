@@ -23,7 +23,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowedOriginsPolicy", policyBuilder =>
     {
-        policyBuilder.WithOrigins("http://127.0.0.1:5500") // Replace with your frontend origin
+        policyBuilder.WithOrigins("*") // Replace with your frontend origin
                      .AllowAnyHeader()
                      .AllowAnyMethod()
                      .AllowCredentials();
