@@ -18,11 +18,12 @@ namespace _4Dorms.Repositories.implementation
         private readonly IGenericRepository<Room> _roomRepository;
         private readonly IGenericRepository<DormitoryImage> _dormitoryImageRepository;
         private readonly IGenericRepository<Review> _reviewRepository;
+        private readonly IGenericRepository<Booking> _bookingRepository;
 
         public UserService(IGenericRepository<Student> studentRepository, IGenericRepository<DormitoryOwner> dormitoryOwnerRepository,
             IGenericRepository<Administrator> administratorRepository, IGenericRepository<FavoriteList> favoriteListRepository,
             IHttpContextAccessor httpContextAccessor, IGenericRepository<Dormitory> dormitoryRepository, IGenericRepository<Room> roomRepository,
-            IGenericRepository<DormitoryImage> dormitoryImageRepository, IGenericRepository<Review> reviewRepository)
+            IGenericRepository<DormitoryImage> dormitoryImageRepository, IGenericRepository<Review> reviewRepository, IGenericRepository<Booking> bookingRepository)
         {
             _administratorRepository = administratorRepository;
             _studentRepository = studentRepository;
@@ -33,6 +34,7 @@ namespace _4Dorms.Repositories.implementation
             _roomRepository = roomRepository;
             _dormitoryImageRepository = dormitoryImageRepository;
             _reviewRepository = reviewRepository;
+            _bookingRepository = bookingRepository;
         }
 
         public async Task<bool> SignUpAsync(SignUpDTO signUpData)
@@ -274,6 +276,8 @@ namespace _4Dorms.Repositories.implementation
                         return false;
 
                     await RemoveFavoriteListsForUser(userId, UserType.Student);
+                    await RemoveReviewsForStudent(userId);
+                    await RemoveBookingsForStudent(userId);
 
                     _studentRepository.Remove(userId);
                     return await _studentRepository.SaveChangesAsync();
@@ -284,7 +288,6 @@ namespace _4Dorms.Repositories.implementation
                         return false;
 
                     await RemoveDormitoriesForOwner(userId);
-
                     await RemoveFavoriteListsForUser(userId, UserType.DormitoryOwner);
 
                     _dormitoryOwnerRepository.Remove(userId);
@@ -301,6 +304,26 @@ namespace _4Dorms.Repositories.implementation
                 default:
                     throw new ArgumentException("Invalid user type.");
             }
+        }
+
+        private async Task RemoveReviewsForStudent(int studentId)
+        {
+            var reviews = _reviewRepository.Query().Where(r => r.StudentId == studentId).ToList();
+            foreach (var review in reviews)
+            {
+                _reviewRepository.Remove(review.ReviewId);
+            }
+            await _reviewRepository.SaveChangesAsync();
+        }
+
+        private async Task RemoveBookingsForStudent(int studentId)
+        {
+            var bookings = _bookingRepository.Query().Where(b => b.StudentId == studentId).ToList();
+            foreach (var booking in bookings)
+            {
+                _bookingRepository.Remove(booking.BookingId);
+            }
+            await _bookingRepository.SaveChangesAsync();
         }
 
         private async Task RemoveDormitoriesForOwner(int ownerId)

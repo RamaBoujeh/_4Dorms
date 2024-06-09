@@ -124,14 +124,18 @@ namespace _4Dorms.Controllers
 
 
         [HttpGet("search")]
-        public async Task<ActionResult<List<Dormitory>>> SearchDormitoriesAsync([FromQuery] string keywords, [FromQuery] string city, [FromQuery] string nearbyUniversity, [FromQuery] string genderType)
+        public async Task<ActionResult<List<Dormitory>>> SearchDormitoriesAsync(
+           [FromQuery] string keywords = null,
+           [FromQuery] string city = null,
+           [FromQuery] string nearbyUniversity = null,
+           [FromQuery] string genderType = null)
         {
             try
             {
                 var dormitories = await _dormitoryService.SearchDormitoriesAsync(keywords, city, nearbyUniversity, genderType);
                 return Ok(dormitories);
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }

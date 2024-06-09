@@ -32,7 +32,6 @@ namespace _4Dorms.Repositories.implementation
 
         public async Task<List<Dormitory>> SearchDormitoriesAsync(string keywords, string city, string nearbyUniversity, string genderType)
         {
-            // Convert search parameters to lowercase for case-insensitive search
             keywords = keywords?.ToLower();
             city = city?.ToLower();
             nearbyUniversity = nearbyUniversity?.ToLower();
@@ -62,13 +61,15 @@ namespace _4Dorms.Repositories.implementation
 
             if (!string.IsNullOrEmpty(genderType))
             {
-                query = query.Where(d => d.GenderType.ToLower() == genderType);
+                var genderList = genderType.Split(',').ToList();
+                query = query.Where(d => genderList.Contains(d.GenderType.ToLower()));
             }
+
+            // Filter by approved status
+            query = query.Where(d => d.Status == DormitoryStatus.Approved);
 
             return await query.Include(d => d.ImageUrls).ToListAsync();
         }
-
-
         public async Task<List<Dormitory>> GetDormsByStatusAsync(DormitoryStatus status)
         {
             _logger.LogInformation("Fetching dormitories with status: {Status}", status);

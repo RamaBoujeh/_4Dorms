@@ -5,7 +5,7 @@ namespace _4Dorms.Repositories.Interfaces
 {
     public interface IDormitoryOwnerService
     {
-        Task SubmitDormitoryForApprovalAsync(DormitoryDTO dormitoryDTO, int dormitoryOwnerId);
+        Task SubmitDormitoryForApprovalAsync(DormitorySubmitDTO dormitoryDTO, int dormitoryOwnerId, List<IFormFile> images);
         Task UpdateDormitoryAsync(int dormitoryId, DormitoryDTO updatedDormitoryDTO);
         Task DeleteDormitoryAsync(int dormitoryId);
     }

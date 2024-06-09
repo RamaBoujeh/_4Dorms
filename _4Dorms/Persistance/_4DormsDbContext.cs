@@ -20,24 +20,20 @@ namespace _4Dorms.Persistance
         public _4DormsDbContext(DbContextOptions<_4DormsDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
+            {
+                base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Administrator>().HasData(
-                new Administrator
-                {
-                    AdministratorId = 1,
-                    Name = "Ruaa",
-                    Email = "Ruaa@example.com",
-                    PhoneNumber = "1234567890",
-                    Password = "000",
-                    ProfilePictureUrl = "none"
-                }
-            );
-            modelBuilder.Entity<FavoriteList>()
-            .HasMany(fl => fl.Dormitories)
-            .WithMany(d => d.Favorites)
-            .UsingEntity(j => j.ToTable("DormitoryFavoriteList"));
+    new Administrator
+    {
+        AdministratorId = 1,
+        Name = "Ruaa",
+        Email = "Ruaa@example.com",
+        PhoneNumber = "1234567890",
+        Password = "000",
+        ProfilePictureUrl = "none"
+    }
+);
 
             modelBuilder.Entity<Dormitory>()
                 .Property(d => d.PriceFullYear)
@@ -51,17 +47,49 @@ namespace _4Dorms.Persistance
                 .Property(p => p.Amount)
                 .HasColumnType("decimal(18,2)");
 
-            base.OnModelCreating(modelBuilder);
+            // Configure cascade delete for Dormitory and related entities
+            modelBuilder.Entity<Dormitory>()
+                .HasMany(d => d.Rooms)
+                .WithOne(r => r.Dormitory)
+                .HasForeignKey(r => r.DormitoryId)
+                .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Dormitory>()
+                .HasMany(d => d.ImageUrls)
+                .WithOne(i => i.Dormitory)
+                .HasForeignKey(i => i.DormitoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Dormitory>()
+                .HasMany(d => d.Reviews)
+                .WithOne(r => r.Dormitory)
+                .HasForeignKey(r => r.DormitoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Dormitory>()
+                .HasMany(d => d.Bookings)
+                .WithOne(b => b.Dormitory)
+                .HasForeignKey(b => b.DormitoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure many-to-many relationship with cascade delete
             modelBuilder.Entity<FavoriteList>()
-            .HasMany(fl => fl.Dormitories)
-            .WithMany(d => d.Favorites)
-            .UsingEntity<Dictionary<string, object>>(
-                "DormitoryFavoriteList",
-                j => j.HasOne<Dormitory>().WithMany().HasForeignKey("DormitoryId"),
-                j => j.HasOne<FavoriteList>().WithMany().HasForeignKey("FavoriteListId")
-            );
+                .HasMany(f => f.Dormitories)
+                .WithMany(d => d.Favorites)
+                .UsingEntity<Dictionary<string, object>>(
+                    "FavoriteListDormitory",
+                    j => j
+                        .HasOne<Dormitory>()
+                        .WithMany()
+                        .HasForeignKey("DormitoryId")
+                        .OnDelete(DeleteBehavior.Cascade),
+                    j => j
+                        .HasOne<FavoriteList>()
+                        .WithMany()
+                        .HasForeignKey("FavoriteListId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                );
         }
 
-    }
+        }
 }

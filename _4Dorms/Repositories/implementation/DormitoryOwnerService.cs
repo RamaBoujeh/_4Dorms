@@ -26,7 +26,7 @@ namespace _4Dorms.Repositories.Implementation
             _logger = logger;
         }
 
-        public async Task SubmitDormitoryForApprovalAsync(DormitoryDTO dormitoryDTO, int dormitoryOwnerId)
+        public async Task SubmitDormitoryForApprovalAsync(DormitorySubmitDTO dormitoryDTO, int dormitoryOwnerId, List<IFormFile> images)
         {
             var dormitory = new Dormitory
             {
@@ -47,17 +47,43 @@ namespace _4Dorms.Repositories.Implementation
             await _genericRepositoryDorm.Add(dormitory);
             await _genericRepositoryDorm.SaveChangesAsync();
 
-            _logger.LogInformation("Dormitory saved with ID: {DormitoryId}", dormitory.DormitoryId);
-
-            if (dormitoryDTO.ImageUrls != null && dormitoryDTO.ImageUrls.Any())
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "dormitoryImages");
+            if (!Directory.Exists(uploadsFolder))
             {
-                var imageUrls = dormitoryDTO.ImageUrls.Select(url => new DormitoryImage { Url = url, DormitoryId = dormitory.DormitoryId }).ToList();
-                await _genericRepositoryDormitoryImage.AddRange(imageUrls);
-                await _genericRepositoryDormitoryImage.SaveChangesAsync();
-                foreach (var imageUrl in imageUrls)
+                _logger.LogInformation("Creating directory: {UploadsFolder}", uploadsFolder);
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            if (images != null && images.Any())
+            {
+                foreach (var image in images)
                 {
-                    _logger.LogInformation("Saved image with URL: {Url} for Dormitory ID: {DormitoryId}", imageUrl.Url, dormitory.DormitoryId);
+                    if (image.Length > 0)
+                    {
+                        var fileName = $"{Guid.NewGuid()}_{image.FileName}";
+                        var filePath = Path.Combine(uploadsFolder, fileName);
+                        _logger.LogInformation("Saving file: {FilePath}", filePath);
+
+                        try
+                        {
+                            using (var stream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await image.CopyToAsync(stream);
+                                _logger.LogInformation("File saved successfully: {FilePath}", filePath);
+                            }
+
+                            var imageUrl = $"/uploads/dormitoryImages/{fileName}";
+                            var dormitoryImage = new DormitoryImage { Url = imageUrl, DormitoryId = dormitory.DormitoryId };
+                            await _genericRepositoryDormitoryImage.Add(dormitoryImage);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Failed to save file: {FilePath}", filePath);
+                            throw; // Rethrow to handle the error accordingly
+                        }
+                    }
                 }
+                await _genericRepositoryDormitoryImage.SaveChangesAsync();
             }
 
             if (dormitoryDTO.RoomDTO != null)
@@ -73,7 +99,6 @@ namespace _4Dorms.Repositories.Implementation
 
                 await _genericRepositoryRoom.Add(room);
                 await _genericRepositoryRoom.SaveChangesAsync();
-                _logger.LogInformation("Room saved for Dormitory ID: {DormitoryId}", dormitory.DormitoryId);
             }
         }
 
@@ -97,20 +122,35 @@ namespace _4Dorms.Repositories.Implementation
             dormitory.PriceHalfYear = updatedDormitoryDTO.PriceHalfYear;
             dormitory.PriceFullYear = updatedDormitoryDTO.PriceFullYear;
 
-            // Remove existing images
             var imagesToRemove = dormitory.ImageUrls.ToList();
             foreach (var image in imagesToRemove)
             {
-                _genericRepositoryDorm.Remove(image.ImageId);
+                _genericRepositoryDormitoryImage.Remove(image.ImageId);
             }
 
-            // Add new images
             dormitory.ImageUrls.Clear();
-            dormitory.ImageUrls = updatedDormitoryDTO.ImageUrls.Select(url => new DormitoryImage { Url = url }).ToList();
+            if (updatedDormitoryDTO.ImageUrls != null)
+            {
+                dormitory.ImageUrls = updatedDormitoryDTO.ImageUrls.Select(url => new DormitoryImage { Url = url }).ToList();
+            }
 
             _genericRepositoryDorm.Update(dormitory);
             await _genericRepositoryDorm.SaveChangesAsync();
+
+            // Update room details
+            var room = await _genericRepositoryRoom.FindByConditionAsync(r => r.DormitoryId == dormitoryId);
+            if (room != null)
+            {
+                room.PrivateRoom = updatedDormitoryDTO.RoomDTO.PrivateRoom;
+                room.SharedRoom = updatedDormitoryDTO.RoomDTO.SharedRoom;
+                room.NumOfPrivateRooms = updatedDormitoryDTO.RoomDTO.NumOfPrivateRooms;
+                room.NumOfSharedRooms = updatedDormitoryDTO.RoomDTO.NumOfSharedRooms;
+
+                _genericRepositoryRoom.Update(room);
+                await _genericRepositoryRoom.SaveChangesAsync();
+            }
         }
+
 
         public async Task DeleteDormitoryAsync(int dormitoryId)
         {
@@ -120,16 +160,10 @@ namespace _4Dorms.Repositories.Implementation
                 throw new Exception("Dormitory not found");
             }
 
-            // Remove associated images
-            var imagesToRemove = dormitory.ImageUrls.ToList();
-            foreach (var image in imagesToRemove)
-            {
-                _genericRepositoryDorm.Remove(image.ImageId);
-            }
-
-            // Remove the dormitory
             _genericRepositoryDorm.Remove(dormitoryId);
             await _genericRepositoryDorm.SaveChangesAsync();
         }
+
+
     }
 }
