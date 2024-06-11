@@ -26,6 +26,27 @@ namespace _4Dorms.Repositories.Implementation
             _logger = logger;
         }
 
+        public async Task<IEnumerable<DormitoryOwner>> GetAllOwnersAsync()
+        {
+            return await _genericRepositoryDormitoryOwner.GetAllAsync();
+        }
+
+        public async Task<DormitoryOwnerDTO> GetOwnerByIdAsync(int ownerId)
+        {
+            var owner = await _genericRepositoryDormitoryOwner.GetByIdAsync(ownerId);
+            if (owner == null) return null;
+
+            return new DormitoryOwnerDTO
+            {
+                Name = owner.Name,
+                Email = owner.Email,
+                Password = owner.Password,
+                PhoneNumber = owner.PhoneNumber,
+                Gender = owner.Gender,
+                DateOfBirth = owner.DateOfBirth
+            };
+        }
+
         public async Task SubmitDormitoryForApprovalAsync(DormitorySubmitDTO dormitoryDTO, int dormitoryOwnerId, List<IFormFile> images)
         {
             var dormitory = new Dormitory

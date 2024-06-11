@@ -38,6 +38,26 @@ namespace _4Dorms.Controllers
             }
         }
 
+        [HttpGet("{studentId}")]
+        public async Task<ActionResult<StudentDTO>> GetStudent(int studentId)
+        {
+            try
+            {
+                var student = await _studentService.GetStudentByIdAsync(studentId);
+                if (student == null)
+                {
+                    return NotFound();
+                }
+                return Ok(student);
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching student");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+
         [HttpDelete("{studentId}")]
         public async Task<IActionResult> DeleteStudent(int studentId)
         {

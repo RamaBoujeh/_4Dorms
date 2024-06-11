@@ -12,10 +12,12 @@ namespace _4Dorms.Controllers
     {
         private readonly IAdministratorService _administratorService;
         private readonly IDormitoryService _dormitoryService;
-        public AdministratorController(IAdministratorService administratorService, IDormitoryService dormitoryService)
+        private readonly IUserService _userService;
+        public AdministratorController(IAdministratorService administratorService, IDormitoryService dormitoryService, IUserService userService)
         {
             _administratorService = administratorService;
             _dormitoryService = dormitoryService;
+            _userService = userService;
         }
 
         
@@ -68,5 +70,21 @@ namespace _4Dorms.Controllers
             else
                 return NotFound();
         }
+
+        [HttpDelete("{ownerId}")]
+        public async Task<IActionResult> DeleteOwner(int ownerId)
+        {
+            var result = await _userService.DeleteUserProfileAsync(ownerId, UserType.DormitoryOwner);
+
+            if (result)
+            {
+                return Ok();
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
     }
 }

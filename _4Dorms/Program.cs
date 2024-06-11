@@ -9,9 +9,7 @@ using _4Dorms.Models;
 using _4Dorms.Repositories.Implementation;
 using _4Dorms.Repositories.implementation;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.FileProviders;
 using System.IO;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +29,13 @@ builder.Services.AddCors(options =>
                      .AllowAnyHeader()
                      .AllowAnyMethod();
     });
+});
+
+builder.Services.AddSingleton<FileService>(provider =>
+{
+    var logger = provider.GetRequiredService<ILogger<FileService>>();
+    var uploadsFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "dormitoryImages");
+    return new FileService(logger, uploadsFolderPath);
 });
 
 var key = Encoding.ASCII.GetBytes("Rama-Issam-Boujeh-backend-project"); // Replace with your secret key
@@ -101,7 +106,7 @@ builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IGenericRepository<Booking>, GenericRepository<Booking>>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
-builder.Services.AddScoped<IDormitoryOwnerService,  DormitoryOwnerService>();
+builder.Services.AddScoped<IDormitoryOwnerService, DormitoryOwnerService>();
 builder.Services.AddLogging(logging =>
 {
     logging.ClearProviders();
@@ -138,6 +143,7 @@ app.UseCors("AllowedOriginsPolicy"); // Use the CORS policy
 
 app.UseAuthentication();
 app.UseAuthorization();
+
 var uploadsFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "dormitoryImages");
 if (!Directory.Exists(uploadsFolderPath))
 {
@@ -146,9 +152,10 @@ if (!Directory.Exists(uploadsFolderPath))
 
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(uploadsFolderPath),
-    RequestPath = "/uploads/dormitoryImages"
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
+    RequestPath = ""
 });
+
 app.UseRouting();
 
 app.UseEndpoints(endpoints =>

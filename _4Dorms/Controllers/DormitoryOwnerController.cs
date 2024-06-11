@@ -1,12 +1,15 @@
-﻿using _4Dorms.GenericRepo;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using _4Dorms.GenericRepo;
 using _4Dorms.Models;
 using _4Dorms.Repositories.implementation;
 using _4Dorms.Repositories.Interfaces;
 using _4Dorms.Resources;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace _4Dorms.Controllers
 {
@@ -17,13 +20,54 @@ namespace _4Dorms.Controllers
         private readonly IDormitoryOwnerService _dormitoryOwnerService;
         private readonly IUserService _userService;
         private readonly ILogger<DormitoryOwnerController> _logger;
+        private readonly FileService _fileService;
 
-        public DormitoryOwnerController(IDormitoryOwnerService dormitoryOwnerService, ILogger<DormitoryOwnerController> logger, IUserService userService)
+        public DormitoryOwnerController(
+            IDormitoryOwnerService dormitoryOwnerService,
+            ILogger<DormitoryOwnerController> logger,
+            IUserService userService,
+            FileService fileService)
         {
-            _userService = userService;
             _dormitoryOwnerService = dormitoryOwnerService;
+            _userService = userService;
             _logger = logger;
+            _fileService = fileService;
         }
+
+        [HttpGet]
+        public async Task<ActionResult<List<DormitoryOwner>>> GetAllOwners()
+        {
+            try
+            {
+                var owners = await _dormitoryOwnerService.GetAllOwnersAsync();
+                return Ok(owners);
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching dormitory owners");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet("{ownerId}")]
+        public async Task<ActionResult<DormitoryOwnerDTO>> GetOwner(int ownerId)
+        {
+            try
+            {
+                var owner = await _dormitoryOwnerService.GetOwnerByIdAsync(ownerId);
+                if (owner == null)
+                {
+                    return NotFound();
+                }
+                return Ok(owner);
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching owner");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
 
         [Authorize(Roles = "DormitoryOwner")]
         [HttpPost("submit-dormitory")]
@@ -50,6 +94,36 @@ namespace _4Dorms.Controllers
             return Ok("Dormitory submitted for approval successfully");
         }
 
+        [HttpPost("upload")]
+        public IActionResult UploadFile(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("No file uploaded.");
+            }
+
+            // Read the file bytes
+            byte[] fileBytes;
+            using (var memoryStream = new MemoryStream())
+            {
+                file.CopyTo(memoryStream);
+                fileBytes = memoryStream.ToArray();
+            }
+
+            // Save the file
+            var fileName = Guid.NewGuid().ToString() + "_" + file.FileName;
+            var result = _fileService.SaveFile(fileBytes, fileName);
+
+            if (result)
+            {
+                return Ok("File uploaded successfully.");
+            }
+            else
+            {
+                return StatusCode(500, "Error saving file.");
+            }
+        }
+
         [Authorize(Roles = "DormitoryOwner")]
         [HttpPut("update-dormitory/{dormitoryId}")]
         public async Task<IActionResult> UpdateDormitory(int dormitoryId, [FromBody] DormitoryDTO updatedDormitoryDTO)
@@ -69,7 +143,6 @@ namespace _4Dorms.Controllers
                 return StatusCode(500, $"An error occurred while updating the dormitory: {ex.Message}");
             }
         }
-
 
         [Authorize(Roles = "DormitoryOwner")]
         [HttpDelete("delete-dormitory/{dormitoryId}")]
@@ -101,7 +174,5 @@ namespace _4Dorms.Controllers
                 return NotFound();
             }
         }
-
-
     }
 }

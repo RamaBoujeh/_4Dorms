@@ -24,5 +24,23 @@ namespace _4Dorms.Repositories.implementation
             return await _genericRepositoryStudent.GetAllAsync();
         }
 
+        public async Task<StudentDTO> GetStudentByIdAsync(int studentId)
+        {
+            var student = await _genericRepositoryStudent.GetByIdAsync(studentId);
+            if (student == null) return null;
+
+            return new StudentDTO
+            {
+                Name = student.Name,
+                Email = student.Email,
+                Password = student.Password,
+                PhoneNumber = student.PhoneNumber,
+                Gender = student.Gender,
+                DateOfBirth = student.DateOfBirth,
+                Disabilities = student.Disabilities
+            };
+        }
+
+
     }
 }

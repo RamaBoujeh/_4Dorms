@@ -90,7 +90,7 @@ namespace _4Dorms.Repositories.implementation
         {
             return await _genericRepositoryDorm.Query()
                 .Where(d => d.DormitoryOwnerId == dormitoryOwnerId)
-                .Include(d => d.ImageUrls)
+                .Include(d => d.ImageUrls) // Ensure image URLs are included
                 .ToListAsync();
         }
 
