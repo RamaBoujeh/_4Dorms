@@ -49,7 +49,6 @@ namespace _4Dorms.Controllers
             return Ok(new { imageUrl });
         }
 
-
         [HttpGet("dormitory/{id}")]
         public async Task<IActionResult> GetDormitoryById(int id)
         {

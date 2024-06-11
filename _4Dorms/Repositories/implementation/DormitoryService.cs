@@ -27,8 +27,11 @@ namespace _4Dorms.Repositories.implementation
 
         public async Task<Dormitory> GetDormitoryByIdAsync(int dormitoryId)
         {
-            return await _genericRepositoryDorm.GetByIdAsync(dormitoryId);
+            return await _genericRepositoryDorm.Query()
+                .Include(d => d.ImageUrls) // Eager load the ImageUrls
+                .FirstOrDefaultAsync(d => d.DormitoryId == dormitoryId);
         }
+
 
         public async Task<List<Dormitory>> SearchDormitoriesAsync(string keywords, string city, string nearbyUniversity, string genderType)
         {

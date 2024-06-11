@@ -150,9 +150,11 @@ if (!Directory.Exists(uploadsFolderPath))
     Directory.CreateDirectory(uploadsFolderPath);
 }
 
+// Add static file middleware
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
     RequestPath = ""
 });
 
