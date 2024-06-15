@@ -47,7 +47,7 @@ namespace _4Dorms.Controllers
             var userType = userTypeClaim.Value;
             _logger.LogInformation("User type from token: {UserType}", userType);
 
-            var favoriteListId = await _favoriteListService.GetFavoriteListIdAsync(userId, userType);
+            var favoriteListId = await _favoriteListService.GetFavoriteDormsAsync(userId, userType);
 
             if (favoriteListId == null)
             {
@@ -92,7 +92,7 @@ namespace _4Dorms.Controllers
             var userType = userTypeClaim.Value;
             _logger.LogInformation("User type from token: {UserType}", userType);
 
-            int? favoriteListId = await _favoriteListService.GetFavoriteListIdAsync(userId, userType);
+            int? favoriteListId = await _favoriteListService.GetFavoriteDormsAsync(userId, userType);
             if (!favoriteListId.HasValue)
             {
                 _logger.LogWarning("Favorite list not found for user ID {UserId} and type {UserType}", userId, userType);
@@ -147,7 +147,7 @@ namespace _4Dorms.Controllers
             var userId = int.Parse(userIdClaim.Value);
             _logger.LogInformation("User ID from token: {UserId}", userId);
 
-            var favoriteListId = await _favoriteListService.GetFavoriteListIdAsync(userId, role);
+            var favoriteListId = await _favoriteListService.GetFavoriteDormsAsync(userId, role);
             if (favoriteListId == null)
             {
                 return StatusCode(500, "Failed to retrieve favorite list ID");
@@ -174,10 +174,13 @@ namespace _4Dorms.Controllers
                 d.PriceFullYear,
                 d.Status,
                 d.DormitoryOwnerId,
-                d.AdministratorId
+                d.AdministratorId,
+                ImageUrls = d.ImageUrls.Select(i => new { i.Url }).ToList() // Include image URLs
             }).ToList();
 
             return Ok(favoriteDormitories);
         }
+
+
     }
 }

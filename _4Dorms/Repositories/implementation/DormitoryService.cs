@@ -103,8 +103,9 @@ namespace _4Dorms.Repositories.implementation
         }
         public async Task<Dormitory> GetDormitoryDetailsAsync(int dormitoryId)
         {
-            var dorm = await _genericRepositoryDorm.GetByIdAsync(dormitoryId);
-            return dorm;
+            return await _genericRepositoryDorm.Query()
+                .Include(d => d.ImageUrls)
+                .FirstOrDefaultAsync(d => d.DormitoryId == dormitoryId);
         }
 
 

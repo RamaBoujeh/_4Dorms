@@ -61,7 +61,7 @@ namespace _4Dorms.Repositories.Implementation
             }
         }
 
-        public async Task<int?> GetFavoriteListIdAsync(int userId, string userType)
+        public async Task<int?> GetFavoriteDormsAsync(int userId, string userType)
         {
             try
             {
@@ -71,6 +71,8 @@ namespace _4Dorms.Repositories.Implementation
                 {
                     case "Student":
                         var studentFavoriteList = await _favoriteListRepository.Query()
+                            .Include(f => f.Dormitories) // Include dormitories
+                            .ThenInclude(d => d.ImageUrls) // Include images
                             .FirstOrDefaultAsync(f => f.StudentId == userId);
                         if (studentFavoriteList == null)
                         {
@@ -82,6 +84,8 @@ namespace _4Dorms.Repositories.Implementation
 
                     case "DormitoryOwner":
                         var ownerFavoriteList = await _favoriteListRepository.Query()
+                            .Include(f => f.Dormitories) // Include dormitories
+                            .ThenInclude(d => d.ImageUrls) // Include images
                             .FirstOrDefaultAsync(f => f.DormitoryOwnerId == userId);
                         if (ownerFavoriteList == null)
                         {
@@ -102,6 +106,7 @@ namespace _4Dorms.Repositories.Implementation
                 return null;
             }
         }
+
 
         public async Task<FavoriteList> GetFavoriteListByIdAsync(int favoriteListId)
         {
