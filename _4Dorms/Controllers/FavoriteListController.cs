@@ -175,7 +175,7 @@ namespace _4Dorms.Controllers
                 d.Status,
                 d.DormitoryOwnerId,
                 d.AdministratorId,
-                ImageUrls = d.ImageUrls.Select(i => new { i.Url }).ToList() // Include image URLs
+                d.ImageUrls
             }).ToList();
 
             return Ok(favoriteDormitories);

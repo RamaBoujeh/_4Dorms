@@ -7,9 +7,9 @@ using _4Dorms.Repositories.Interfaces;
 using _4Dorms.GenericRepo;
 using _4Dorms.Models;
 using _4Dorms.Repositories.Implementation;
-using _4Dorms.Repositories.implementation;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
+using _4Dorms.Repositories.implementation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,14 +31,15 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddSingleton<FileService>(provider =>
+// Correct FileService Registration
+builder.Services.AddScoped<IFileService>(provider =>
 {
     var logger = provider.GetRequiredService<ILogger<FileService>>();
     var uploadsFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "dormitoryImages");
     return new FileService(logger, uploadsFolderPath);
 });
 
-var key = Encoding.ASCII.GetBytes("Rama-Issam-Boujeh-backend-project"); // Replace with your secret key
+var key = Encoding.ASCII.GetBytes("Rama-Issam-Boujeh-backend-project");
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -54,8 +55,8 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = "YourIssuer", // Replace with your issuer
-        ValidAudience = "YourAudience", // Replace with your audience
+        ValidIssuer = "YourIssuer",
+        ValidAudience = "YourAudience",
         IssuerSigningKey = new SymmetricSecurityKey(key)
     };
     options.Events = new JwtBearerEvents
@@ -83,8 +84,6 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdministratorPolicy", policy => policy.RequireClaim("role", "Administrator"));
 });
 
-builder.Services.AddControllers();
-
 builder.Services.AddDbContext<_4DormsDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
            .EnableSensitiveDataLogging()
@@ -106,14 +105,18 @@ builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IGenericRepository<Booking>, GenericRepository<Booking>>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
-builder.Services.AddScoped<IDormitoryOwnerService, DormitoryOwnerService>();
 builder.Services.AddLogging(logging =>
 {
     logging.ClearProviders();
     logging.AddConsole();
     logging.AddDebug();
-    // Add other logging providers if needed
 });
+
+// Register the generic repository
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+// Register the specific repository for DormitoryImage
+builder.Services.AddScoped<IGenericRepository<DormitoryImage>, GenericRepository<DormitoryImage>>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -122,7 +125,7 @@ builder.Services.AddAutoMapper(typeof(Program));
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.Limits.MaxRequestHeadersTotalSize = 32768; // Increase as necessary
+    serverOptions.Limits.MaxRequestHeadersTotalSize = 32768;
 });
 
 var app = builder.Build();
@@ -136,11 +139,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseRouting();
-
-app.UseCors("AllowedOriginsPolicy"); // Use the CORS policy
-
+app.UseCors("AllowedOriginsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -150,21 +150,15 @@ if (!Directory.Exists(uploadsFolderPath))
     Directory.CreateDirectory(uploadsFolderPath);
 }
 
-// Add static file middleware
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
     RequestPath = ""
 });
-
-app.UseRouting();
 
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
 });
-
-app.MapControllers();
 
 app.Run();

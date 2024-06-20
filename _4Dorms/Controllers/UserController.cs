@@ -102,7 +102,7 @@ namespace _4Dorms.Controllers
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
                     Subject = new ClaimsIdentity(claims),
-                    Expires = DateTime.UtcNow.AddDays(300),
+                    Expires = DateTime.UtcNow.AddDays(400),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
                     Issuer = "YourIssuer",
                     Audience = "YourAudience"

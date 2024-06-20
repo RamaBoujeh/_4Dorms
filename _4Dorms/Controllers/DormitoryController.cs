@@ -12,12 +12,21 @@ namespace _4Dorms.Controllers
     public class DormitoryController : ControllerBase
     {
         private readonly IDormitoryService _dormitoryService;
+        private readonly IFileService _fileService;
         private readonly ILogger<DormitoryController> _logger;
 
-        public DormitoryController(IDormitoryService dormitoryService, ILogger<DormitoryController> logger)
+        public DormitoryController(IDormitoryService dormitoryService, IFileService fileService , ILogger<DormitoryController> logger)
         {
             _dormitoryService = dormitoryService;
             _logger = logger;
+            _fileService = fileService;
+        }
+
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllDormitories()
+        {
+            var dormitories = await _dormitoryService.GetAllDormitoriesAsync();
+            return Ok(dormitories);
         }
 
         [HttpPost("upload-image")]

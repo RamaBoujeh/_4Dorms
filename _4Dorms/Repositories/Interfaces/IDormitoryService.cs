@@ -5,6 +5,7 @@ namespace _4Dorms.Repositories.Interfaces
 {
     public interface IDormitoryService
     {
+        Task<List<Dormitory>> GetAllDormitoriesAsync();
         Task<Dormitory> GetDormitoryByIdAsync(int dormitoryId);
         Task<List<Dormitory>> SearchDormitoriesAsync(string keywords, string city, string nearbyUniversity, string genderType);
         Task<List<Dormitory>> GetDormsByStatusAsync(DormitoryStatus status);

@@ -3,6 +3,7 @@ using _4Dorms.Models;
 using _4Dorms.Repositories.implementation;
 using _4Dorms.Repositories.Interfaces;
 using _4Dorms.Resources;
+using MySqlX.XDevAPI.Common;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,15 +16,17 @@ namespace _4Dorms.Repositories.Implementation
         private readonly IGenericRepository<Room> _genericRepositoryRoom;
         private readonly IGenericRepository<DormitoryImage> _genericRepositoryDormitoryImage;
         private readonly ILogger<DormitoryService> _logger;
+        private readonly IFileService _fileService;
 
         public DormitoryOwnerService(IGenericRepository<DormitoryOwner> genericRepositoryDormitoryOwner, IGenericRepository<Dormitory> genericRepositoryDorm,
-            IGenericRepository<Room> genericRepositoryRoom, IGenericRepository<DormitoryImage> genericRepositoryDormitoryImage, ILogger<DormitoryService> logger)
+            IGenericRepository<Room> genericRepositoryRoom, IGenericRepository<DormitoryImage> genericRepositoryDormitoryImage, ILogger<DormitoryService> logger, IFileService fileService)
         {
             _genericRepositoryDormitoryOwner = genericRepositoryDormitoryOwner;
             _genericRepositoryDorm = genericRepositoryDorm;
             _genericRepositoryRoom = genericRepositoryRoom;
             _genericRepositoryDormitoryImage = genericRepositoryDormitoryImage;
             _logger = logger;
+            _fileService = fileService;
         }
 
         public async Task<IEnumerable<DormitoryOwner>> GetAllOwnersAsync()
@@ -123,53 +126,62 @@ namespace _4Dorms.Repositories.Implementation
             }
         }
 
-
-        public async Task UpdateDormitoryAsync(int dormitoryId, DormitoryDTO updatedDormitoryDTO)
+        public async Task<Result> UploadImagesAsync(int dormitoryId, List<IFormFile> images)
         {
             var dormitory = await _genericRepositoryDorm.GetByIdAsync(dormitoryId);
             if (dormitory == null)
             {
-                throw new Exception("Dormitory not found");
+                return new Result { IsSuccess = false, Message = "Dormitory not found" };
             }
 
-            dormitory.DormitoryName = updatedDormitoryDTO.DormitoryName;
-            dormitory.Location = updatedDormitoryDTO.Location;
-            dormitory.GenderType = updatedDormitoryDTO.GenderType;
-            dormitory.City = updatedDormitoryDTO.City;
-            dormitory.NearbyUniversity = updatedDormitoryDTO.NearbyUniversity;
-            dormitory.phone = updatedDormitoryDTO.Phone;
-            dormitory.Email = updatedDormitoryDTO.Email;
-            dormitory.DormitoryDescription = updatedDormitoryDTO.DormitoryDescription;
-            dormitory.PriceHalfYear = updatedDormitoryDTO.PriceHalfYear;
-            dormitory.PriceFullYear = updatedDormitoryDTO.PriceFullYear;
-
-            var imagesToRemove = dormitory.ImageUrls.ToList();
-            foreach (var image in imagesToRemove)
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "dormitoryImages");
+            if (!Directory.Exists(uploadsFolder))
             {
-                _genericRepositoryDormitoryImage.Remove(image.ImageId);
+                Directory.CreateDirectory(uploadsFolder);
             }
 
-            dormitory.ImageUrls.Clear();
-            if (updatedDormitoryDTO.ImageUrls != null)
+            foreach (var image in images)
             {
-                dormitory.ImageUrls = updatedDormitoryDTO.ImageUrls.Select(url => new DormitoryImage { Url = url }).ToList();
+                if (image.Length > 0)
+                {
+                    var fileName = $"{Guid.NewGuid()}_{image.FileName}";
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await image.CopyToAsync(stream);
+                    }
+
+                    var imageUrl = $"/uploads/dormitoryImages/{fileName}";
+                    var dormitoryImage = new DormitoryImage { Url = imageUrl, DormitoryId = dormitoryId };
+                    await _genericRepositoryDormitoryImage.Add(dormitoryImage);
+                }
             }
 
-            _genericRepositoryDorm.Update(dormitory);
-            await _genericRepositoryDorm.SaveChangesAsync();
+            await _genericRepositoryDormitoryImage.SaveChangesAsync();
+            return new Result { IsSuccess = true, Message = "Images uploaded successfully" };
+        }
 
-            // Update room details
-            var room = await _genericRepositoryRoom.FindByConditionAsync(r => r.DormitoryId == dormitoryId);
-            if (room != null)
+        public async Task<Result> DeleteImageAsync(int dormitoryId, string fileName)
+        {
+            var dormitoryImage = await _genericRepositoryDormitoryImage
+                .FindByConditionAsync(img => img.DormitoryId == dormitoryId && img.Url.Contains(fileName));
+
+            if (dormitoryImage == null)
             {
-                room.PrivateRoom = updatedDormitoryDTO.RoomDTO.PrivateRoom;
-                room.SharedRoom = updatedDormitoryDTO.RoomDTO.SharedRoom;
-                room.NumOfPrivateRooms = updatedDormitoryDTO.RoomDTO.NumOfPrivateRooms;
-                room.NumOfSharedRooms = updatedDormitoryDTO.RoomDTO.NumOfSharedRooms;
-
-                _genericRepositoryRoom.Update(room);
-                await _genericRepositoryRoom.SaveChangesAsync();
+                return new Result { IsSuccess = false, Message = "Image not found or does not belong to the dormitory" };
             }
+
+            var isFileDeleted = _fileService.DeleteFile(fileName);
+
+            if (!isFileDeleted)
+            {
+                return new Result { IsSuccess = false, Message = "Failed to delete the image file" };
+            }
+
+            _genericRepositoryDormitoryImage.Remove(dormitoryImage.ImageId);
+            await _genericRepositoryDormitoryImage.SaveChangesAsync();
+
+            return new Result { IsSuccess = true };
         }
 
 
@@ -184,6 +196,89 @@ namespace _4Dorms.Repositories.Implementation
             _genericRepositoryDorm.Remove(dormitoryId);
             await _genericRepositoryDorm.SaveChangesAsync();
         }
+
+        public async Task RemoveDormitoryImageAsync(int imageId)
+        {
+            var image = await _genericRepositoryDormitoryImage.GetByIdAsync(imageId);
+            if (image != null)
+            {
+                _genericRepositoryDormitoryImage.Remove(image.ImageId);
+                await _genericRepositoryDormitoryImage.SaveChangesAsync();
+            }
+        }
+
+        // Update the UpdateDormitoryAsync method in DormitoryOwnerService.cs
+        public async Task UpdateDormitoryAsync(int dormitoryId, DormitoryDTO updatedDormitoryDTO, List<IFormFile> newImages)
+        {
+            _logger.LogInformation("Updating dormitory with ID: {DormitoryId}", dormitoryId);
+
+            var dormitory = await _genericRepositoryDorm.GetByIdAsync(dormitoryId);
+            if (dormitory == null)
+            {
+                _logger.LogWarning("Dormitory with ID {DormitoryId} not found", dormitoryId);
+                throw new Exception("Dormitory not found");
+            }
+
+            dormitory.DormitoryName = updatedDormitoryDTO.DormitoryName ?? dormitory.DormitoryName;
+            dormitory.Location = updatedDormitoryDTO.Location ?? dormitory.Location;
+            dormitory.GenderType = updatedDormitoryDTO.GenderType ?? dormitory.GenderType;
+            dormitory.City = updatedDormitoryDTO.City ?? dormitory.City;
+            dormitory.NearbyUniversity = updatedDormitoryDTO.NearbyUniversity ?? dormitory.NearbyUniversity;
+            dormitory.phone = updatedDormitoryDTO.Phone ?? dormitory.phone;
+            dormitory.Email = updatedDormitoryDTO.Email ?? dormitory.Email;
+            dormitory.DormitoryDescription = updatedDormitoryDTO.DormitoryDescription ?? dormitory.DormitoryDescription;
+            dormitory.PriceHalfYear = updatedDormitoryDTO.PriceHalfYear ?? dormitory.PriceHalfYear;
+            dormitory.PriceFullYear = updatedDormitoryDTO.PriceFullYear ?? dormitory.PriceFullYear;
+
+            // Ensure ImageUrls is not null
+            var updatedImageUrls = updatedDormitoryDTO.ImageUrls ?? new List<string>();
+
+            var imagesToRemove = dormitory.ImageUrls.Where(img => !updatedImageUrls.Contains(img.Url)).ToList();
+            foreach (var image in imagesToRemove)
+            {
+                _genericRepositoryDormitoryImage.Remove(image.ImageId);
+            }
+
+            dormitory.ImageUrls = updatedImageUrls.Select(url => new DormitoryImage { Url = url }).ToList();
+
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "dormitoryImages");
+            if (newImages != null && newImages.Any())
+            {
+                foreach (var image in newImages)
+                {
+                    if (image.Length > 0)
+                    {
+                        var fileName = $"{Guid.NewGuid()}_{image.FileName}";
+                        var filePath = Path.Combine(uploadsFolder, fileName);
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await image.CopyToAsync(stream);
+                        }
+
+                        var imageUrl = $"/uploads/dormitoryImages/{fileName}";
+                        var dormitoryImage = new DormitoryImage { Url = imageUrl, DormitoryId = dormitory.DormitoryId };
+                        await _genericRepositoryDormitoryImage.Add(dormitoryImage);
+                    }
+                }
+                await _genericRepositoryDormitoryImage.SaveChangesAsync();
+            }
+
+            _genericRepositoryDorm.Update(dormitory);
+            await _genericRepositoryDorm.SaveChangesAsync();
+
+            var room = await _genericRepositoryRoom.FindByConditionAsync(r => r.DormitoryId == dormitoryId);
+            if (room != null)
+            {
+                room.PrivateRoom = updatedDormitoryDTO.RoomDTO?.PrivateRoom ?? room.PrivateRoom;
+                room.SharedRoom = updatedDormitoryDTO.RoomDTO?.SharedRoom ?? room.SharedRoom;
+                room.NumOfPrivateRooms = updatedDormitoryDTO.RoomDTO?.NumOfPrivateRooms ?? room.NumOfPrivateRooms;
+                room.NumOfSharedRooms = updatedDormitoryDTO.RoomDTO?.NumOfSharedRooms ?? room.NumOfSharedRooms;
+
+                _genericRepositoryRoom.Update(room);
+                await _genericRepositoryRoom.SaveChangesAsync();
+            }
+        }
+
 
 
     }

@@ -8,7 +8,9 @@ namespace _4Dorms.Repositories.Interfaces
         Task<IEnumerable<DormitoryOwner>> GetAllOwnersAsync();
         Task<DormitoryOwnerDTO> GetOwnerByIdAsync(int ownerId);
         Task SubmitDormitoryForApprovalAsync(DormitorySubmitDTO dormitoryDTO, int dormitoryOwnerId, List<IFormFile> images);
-        Task UpdateDormitoryAsync(int dormitoryId, DormitoryDTO updatedDormitoryDTO);
         Task DeleteDormitoryAsync(int dormitoryId);
+        Task<Result> DeleteImageAsync(int dormitoryId, string fileName);
+        Task<Result> UploadImagesAsync(int dormitoryId, List<IFormFile> images);
+        Task UpdateDormitoryAsync(int dormitoryId, DormitoryDTO updatedDormitoryDTO, List<IFormFile> newImages);
     }
 }

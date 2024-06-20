@@ -32,7 +32,12 @@ namespace _4Dorms.Repositories.implementation
                 .FirstOrDefaultAsync(d => d.DormitoryId == dormitoryId);
         }
 
-
+        public async Task<List<Dormitory>> GetAllDormitoriesAsync()
+        {
+            var allDorms = await _genericRepositoryDorm.GetAllAsync();
+            _genericRepositoryDorm.SaveChangesAsync();
+            return allDorms.ToList();
+        }
         public async Task<List<Dormitory>> SearchDormitoriesAsync(string keywords, string city, string nearbyUniversity, string genderType)
         {
             keywords = keywords?.ToLower();
@@ -89,6 +94,7 @@ namespace _4Dorms.Repositories.implementation
                 throw;
             }
         }
+
         public async Task<List<Dormitory>> GetDormsByOwnerIdAsync(int dormitoryOwnerId)
         {
             return await _genericRepositoryDorm.Query()
