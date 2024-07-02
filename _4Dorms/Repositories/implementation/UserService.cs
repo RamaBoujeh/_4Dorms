@@ -463,42 +463,76 @@ namespace _4Dorms.Repositories.implementation
         }
 
         //--------------------------------------------------------------------
-        public async Task<bool> ChangePasswordAsync(ChangePasswordDTO changePasswordData)
+        public async Task<Result> ChangePasswordAsync(ChangePasswordDTO changePasswordData)
         {
             switch (changePasswordData.UserType)
             {
                 case UserType.Student:
                     var student = await _studentRepository.GetByIdAsync(changePasswordData.UserId);
-                    if (student == null || student.Password != changePasswordData.OldPassword)
-                        return false;
+                    if (student == null || !VerifyPassword(student.Password, changePasswordData.OldPassword))
+                        return new Result { IsSuccess = false, Message = "Old password is incorrect" };
 
-                    student.Password = changePasswordData.NewPassword;
+                    student.Password = HashPassword(changePasswordData.NewPassword);
                     _studentRepository.Update(student);
                     break;
 
                 case UserType.DormitoryOwner:
                     var dormitoryOwner = await _dormitoryOwnerRepository.GetByIdAsync(changePasswordData.UserId);
-                    if (dormitoryOwner == null || dormitoryOwner.Password != changePasswordData.OldPassword)
-                        return false;
+                    if (dormitoryOwner == null || !VerifyPassword(dormitoryOwner.Password, changePasswordData.OldPassword))
+                        return new Result { IsSuccess = false, Message = "Old password is incorrect" };
 
-                    dormitoryOwner.Password = changePasswordData.NewPassword;
+                    dormitoryOwner.Password = HashPassword(changePasswordData.NewPassword);
                     _dormitoryOwnerRepository.Update(dormitoryOwner);
                     break;
 
                 case UserType.Administrator:
                     var administrator = await _administratorRepository.GetByIdAsync(changePasswordData.UserId);
-                    if (administrator == null || administrator.Password != changePasswordData.OldPassword)
-                        return false;
+                    if (administrator == null || !VerifyPassword(administrator.Password, changePasswordData.OldPassword))
+                        return new Result { IsSuccess = false, Message = "Old password is incorrect" };
 
-                    administrator.Password = changePasswordData.NewPassword;
+                    administrator.Password = HashPassword(changePasswordData.NewPassword);
                     _administratorRepository.Update(administrator);
                     break;
 
                 default:
-                    return false;
+                    return new Result { IsSuccess = false, Message = "Invalid user type" };
             }
 
-            return await SaveChangesAsync(changePasswordData.UserType);
+            await SaveChangesAsync(changePasswordData.UserType);
+            return new Result { IsSuccess = true, Message = "Password changed successfully" };
+        }
+
+        private bool VerifyPassword(string storedPassword, string enteredPassword)
+        {
+            // Implement your password verification logic here (e.g., hashing and comparing)
+            return storedPassword == enteredPassword; // Replace with actual verification
+        }
+
+        private string HashPassword(string password)
+        {
+            // Implement your password hashing logic here
+            return password; // Replace with actual hashing
+        }
+
+        public async Task<bool> VerifyOldPasswordAsync(ChangePasswordDTO changePasswordData)
+        {
+            switch (changePasswordData.UserType)
+            {
+                case UserType.Student:
+                    var student = await _studentRepository.GetByIdAsync(changePasswordData.UserId);
+                    return student != null && student.Password == changePasswordData.OldPassword;
+
+                case UserType.DormitoryOwner:
+                    var dormitoryOwner = await _dormitoryOwnerRepository.GetByIdAsync(changePasswordData.UserId);
+                    return dormitoryOwner != null && dormitoryOwner.Password == changePasswordData.OldPassword;
+
+                case UserType.Administrator:
+                    var administrator = await _administratorRepository.GetByIdAsync(changePasswordData.UserId);
+                    return administrator != null && administrator.Password == changePasswordData.OldPassword;
+
+                default:
+                    return false;
+            }
         }
 
         //-------------------------------------------------------------------------

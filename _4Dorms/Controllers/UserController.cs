@@ -222,17 +222,41 @@ namespace _4Dorms.Controllers
                 return Unauthorized();
             }
 
-            bool success = await _userService.ChangePasswordAsync(changePasswordData);
-            if (success)
+            var result = await _userService.ChangePasswordAsync(changePasswordData);
+            if (result.IsSuccess)
             {
-                return Ok("Password changed successfully.");
+                return Ok(new { message = "Password changed successfully." });
             }
             else
             {
-                return BadRequest("Failed to change password.");
+                return BadRequest(new { message = result.Message });
             }
         }
+        [HttpPost("verify-old-password")]
+        [Authorize]
+        public async Task<IActionResult> VerifyOldPassword([FromBody] ChangePasswordDTO changePasswordData)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
+            var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null || int.Parse(userId) != changePasswordData.UserId)
+            {
+                return Unauthorized();
+            }
+
+            bool isValid = await _userService.VerifyOldPasswordAsync(changePasswordData);
+            if (isValid)
+            {
+                return Ok(new { message = "Old password verified successfully." });
+            }
+            else
+            {
+                return BadRequest(new { message = "Old password is incorrect." });
+            }
+        }
 
         [HttpDelete("{userId}/{userType}")]
         public async Task<IActionResult> DeleteUser(int userId, UserType userType)

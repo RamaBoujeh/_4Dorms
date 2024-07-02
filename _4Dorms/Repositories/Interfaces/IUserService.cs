@@ -10,7 +10,8 @@ namespace _4Dorms.Repositories.Interfaces
         Task<bool> UpdateProfileAsync(UserDTO updateData);
         Task<bool> DeleteUserProfileAsync(int userId, UserType userType);
         Task<UserDTO> GetUserByEmailAsync(string email, UserType userType);
-        Task<bool> ChangePasswordAsync(ChangePasswordDTO changePasswordData);
+        Task<Result> ChangePasswordAsync(ChangePasswordDTO changePasswordData);
+        Task<bool> VerifyOldPasswordAsync(ChangePasswordDTO changePasswordData);
         Task<(object user, string userType)> AuthenticateAsync(string email, string password);
     }
 }
